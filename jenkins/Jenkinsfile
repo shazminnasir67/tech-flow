@@ -101,19 +101,12 @@ pipeline {
                     // Check Python and pip versions
                     sh '''
                         python3 --version
-                        pip3 --version
+                        python3 -m pip --version
                     '''
                     
-                    // Install system dependencies
+                    // Install Python packages using pip
                     sh '''
-                        sudo apt-get update -qq
-                        sudo apt-get install -y -qq \
-                            python3-pip \
-                            python3-venv \
-                            chromium-browser \
-                            chromium-chromedriver \
-                            wget \
-                            curl
+                        python3 -m pip install --user selenium webdriver-manager pytest
                     '''
                 }
             }
@@ -125,18 +118,14 @@ pipeline {
                     echo "Setting up Flask web application..."
                     
                     dir('web-app') {
-                        // Create virtual environment
+                        // Install Flask dependencies
                         sh '''
-                            python3 -m venv venv
-                            source venv/bin/activate
-                            pip install --upgrade pip
-                            pip install -r requirements.txt
+                            python3 -m pip install --user -r requirements.txt
                         '''
                         
                         // Start web application in background
                         sh '''
-                            source venv/bin/activate
-                            python app.py > ../logs/web-app.log 2>&1 &
+                            python3 app.py > ../logs/web-app.log 2>&1 &
                             echo $! > ../web-app.pid
                         '''
                         
@@ -158,18 +147,14 @@ pipeline {
                     echo "Installing test dependencies..."
                     
                     dir('selenium-tests') {
-                        // Create virtual environment for tests
+                        // Install test dependencies
                         sh '''
-                            python3 -m venv test-venv
-                            source test-venv/bin/activate
-                            pip install --upgrade pip
-                            pip install -r requirements.txt
+                            python3 -m pip install --user -r requirements.txt
                         '''
                         
                         // Verify Selenium installation
                         sh '''
-                            source test-venv/bin/activate
-                            python -c "import selenium; print(f'Selenium version: {selenium.__version__}')"
+                            python3 -c "import selenium; print(f'Selenium version: {selenium.__version__}')"
                         '''
                     }
                 }
@@ -191,8 +176,7 @@ pipeline {
                         ]) {
                             // Run test suite
                             sh '''
-                                source test-venv/bin/activate
-                                python test_suite.py > ../logs/test-execution.log 2>&1
+                                python3 test_suite.py > ../logs/test-execution.log 2>&1
                             '''
                         }
                         
