@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  # Flask Web Application
+  web-app:
+    build:
+      context: ../web-app
+      dockerfile: Dockerfile
+    container_name: devops-web-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    volumes:
+      - web-app-data:/app/database
+    networks:
+      - devops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Selenium Test Runner
+  selenium-tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: devops-selenium-tests
+    depends_on:
+      web-app:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://web-app:5000
+      - HEADLESS=true
+      - SCREENSHOTS_DIR=/app/screenshots
+      - REPORTS_DIR=/app/reports
+    volumes:
+      - ../screenshots:/app/screenshots
+      - ../reports:/app/reports
+      - ../logs:/app/logs
+    networks:
+      - devops-network
+    profiles:
+      - testing
+
+  # Jenkins (for local development)
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: devops-jenkins
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    environment:
+      - JENKINS_OPTS=--httpPort=8080
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - devops-network
+    restart: unless-stopped
+    profiles:
+      - jenkins
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: devops-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web-app
+    networks:
+      - devops-network
+    profiles:
+      - production
+
+  # Redis (for session storage)
+  redis:
+    image: redis:alpine
+    container_name: devops-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - devops-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # PostgreSQL (alternative to SQLite)
+  postgres:
+    image: postgres:13-alpine
+    container_name: devops-postgres
+    environment:
+      - POSTGRES_DB=devops_assignment
+      - POSTGRES_USER=devops_user
+      - POSTGRES_PASSWORD=devops_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - devops-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  web-app-data:
+    driver: local
+  jenkins-data:
+    driver: local
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
+
+networks:
+  devops-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 

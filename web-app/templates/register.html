@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - TechFlow{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <div class="logo-icon mx-auto mb-3">
+                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                </div>
+                <h2 class="mb-2">Join TechFlow</h2>
+                <p class="text-muted">Create your account to get started</p>
+            </div>
+
+            <form method="POST" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="full_name" 
+                               name="full_name" 
+                               required 
+                               placeholder="Enter your full name"
+                               autocomplete="name">
+                        <div class="invalid-feedback" style="display: none;">
+                            Please enter your full name.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               required 
+                               placeholder="Choose a username"
+                               autocomplete="username">
+                        <div class="invalid-feedback" style="display: none;">
+                            Please choose a username (at least 3 characters).
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               required 
+                               placeholder="Enter your email address"
+                               autocomplete="email">
+                        <div class="invalid-feedback" style="display: none;">
+                            Please enter a valid email address.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               required 
+                               placeholder="Create a password"
+                               autocomplete="new-password">
+                        <div class="invalid-feedback" style="display: none;">
+                            Password must be at least 8 characters long.
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="confirm_password" 
+                               name="confirm_password" 
+                               required 
+                               placeholder="Confirm your password"
+                               autocomplete="new-password">
+                        <div class="invalid-feedback" style="display: none;">
+                            Passwords do not match.
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                            </label>
+                            <div class="invalid-feedback" style="display: none;">
+                                You must agree to the terms and conditions.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="mb-0">
+                    Already have an account? 
+                    <a href="{{ url_for('login') }}" class="text-primary">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--gray-50) 100%);
+}
+
+.form-card {
+    width: 100%;
+    max-width: 600px;
+    background: white;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+}
+
+.form-card .card-body {
+    padding: 2rem;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.form-control {
+    height: 48px;
+    font-size: 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-fast);
+}
+
+.form-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.btn-lg {
+    height: 48px;
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.row.g-3 {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 1rem;
+}
+
+@media (max-height: 700px) {
+    .form-container {
+        padding: 0.5rem;
+    }
+    
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        height: 44px;
+    }
+    
+    .btn-lg {
+        height: 44px;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-card {
+        max-width: 100%;
+    }
+    
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    console.log('Form found:', form); // Debug log
+    
+    // Add click event listener to the submit button for debugging
+    const submitBtn = form.querySelector('button[type="submit"]');
+    console.log('Submit button found:', submitBtn); // Debug log
+    
+    submitBtn.addEventListener('click', function(e) {
+        console.log('Submit button clicked'); // Debug log
+        console.log('Button type:', this.type); // Debug log
+        console.log('Form action:', form.action); // Debug log
+        console.log('Form method:', form.method); // Debug log
+        
+        // Force form submission if the event doesn't trigger naturally
+        setTimeout(() => {
+            console.log('Attempting to force form submission...'); // Debug log
+            form.submit();
+        }, 100);
+    });
+    
+    form.addEventListener('submit', function(event) {
+        console.log('Form submission event triggered'); // Debug log
+        
+        // Get form elements
+        const fullName = document.getElementById('full_name');
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const terms = document.getElementById('terms');
+        
+        console.log('Form elements found:', {
+            fullName: fullName?.value,
+            username: username?.value,
+            email: email?.value,
+            password: password?.value ? '***' : 'empty',
+            confirmPassword: confirmPassword?.value ? '***' : 'empty',
+            terms: terms?.checked
+        }); // Debug log
+        
+        let isValid = true;
+        
+        // Validate full name
+        if (!fullName.value.trim() || fullName.value.trim().length < 2) {
+            fullName.classList.add('is-invalid');
+            fullName.nextElementSibling.style.display = 'block';
+            isValid = false;
+        } else {
+            fullName.classList.remove('is-invalid');
+            fullName.classList.add('is-valid');
+            fullName.nextElementSibling.style.display = 'none';
+        }
+        
+        // Validate username
+        if (!username.value.trim() || username.value.trim().length < 3) {
+            username.classList.add('is-invalid');
+            username.nextElementSibling.style.display = 'block';
+            isValid = false;
+        } else {
+            username.classList.remove('is-invalid');
+            username.classList.add('is-valid');
+            username.nextElementSibling.style.display = 'none';
+        }
+        
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim() || !emailRegex.test(email.value)) {
+            email.classList.add('is-invalid');
+            email.nextElementSibling.style.display = 'block';
+            isValid = false;
+        } else {
+            email.classList.remove('is-invalid');
+            email.classList.add('is-valid');
+            email.nextElementSibling.style.display = 'none';
+        }
+        
+        // Validate password
+        if (!password.value.trim() || password.value.length < 8) {
+            password.classList.add('is-invalid');
+            password.nextElementSibling.style.display = 'block';
+            isValid = false;
+        } else {
+            password.classList.remove('is-invalid');
+            password.classList.add('is-valid');
+            password.nextElementSibling.style.display = 'none';
+        }
+        
+        // Validate confirm password
+        if (!confirmPassword.value.trim() || confirmPassword.value !== password.value) {
+            confirmPassword.classList.add('is-invalid');
+            confirmPassword.nextElementSibling.style.display = 'block';
+            isValid = false;
+        } else {
+            confirmPassword.classList.remove('is-invalid');
+            confirmPassword.classList.add('is-valid');
+            confirmPassword.nextElementSibling.style.display = 'none';
+        }
+        
+        // Validate terms
+        if (!terms.checked) {
+            terms.classList.add('is-invalid');
+            terms.parentElement.nextElementSibling.style.display = 'block';
+            isValid = false;
+        } else {
+            terms.classList.remove('is-invalid');
+            terms.classList.add('is-valid');
+            terms.parentElement.nextElementSibling.style.display = 'none';
+        }
+        
+        console.log('Validation result:', isValid); // Debug log
+        
+        if (!isValid) {
+            // Prevent form submission if validation fails
+            console.log('Validation failed, preventing submission'); // Debug log
+            event.preventDefault();
+            // Mark form as validated so future blur events show validation
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        console.log('Validation passed, allowing submission'); // Debug log
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        submitBtn.disabled = true;
+        
+        // Form will submit naturally - no need to return true
+    });
+    
+    // Real-time validation only after user interaction
+    const inputs = form.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        const feedback = input.nextElementSibling;
+        
+        // Only validate on blur (when user leaves the field)
+        input.addEventListener('blur', function() {
+            if (form.classList.contains('was-validated')) {
+                validateField(this);
+            }
+        });
+        
+        // Clear validation on input (when user starts typing)
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                this.classList.remove('is-invalid');
+                if (feedback) feedback.style.display = 'none';
+            }
+            if (this.value.trim()) {
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+            }
+        });
+    });
+    
+    // Password confirmation validation
+    const confirmPassword = document.getElementById('confirm_password');
+    const password = document.getElementById('password');
+    
+    confirmPassword.addEventListener('input', function() {
+        if (this.value && password.value) {
+            if (this.value === password.value) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                this.nextElementSibling.style.display = 'none';
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                this.nextElementSibling.style.display = 'block';
+            }
+        }
+    });
+    
+    function validateField(field) {
+        const value = field.value.trim();
+        const feedback = field.nextElementSibling;
+        
+        switch(field.id) {
+            case 'full_name':
+                if (value.length >= 2) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (feedback) feedback.style.display = 'none';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (feedback) feedback.style.display = 'block';
+                }
+                break;
+                
+            case 'username':
+                if (value.length >= 3) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (feedback) feedback.style.display = 'none';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (feedback) feedback.style.display = 'block';
+                }
+                break;
+                
+            case 'email':
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (emailRegex.test(value)) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (feedback) feedback.style.display = 'none';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (feedback) feedback.style.display = 'block';
+                }
+                break;
+                
+            case 'password':
+                if (value.length >= 8) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (feedback) feedback.style.display = 'none';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (feedback) feedback.style.display = 'block';
+                }
+                break;
+                
+            case 'confirm_password':
+                if (value && value === password.value) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (feedback) feedback.style.display = 'none';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (feedback) feedback.style.display = 'block';
+                }
+                break;
+                
+            case 'terms':
+                if (field.checked) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    if (feedback) feedback.style.display = 'none';
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    if (feedback) feedback.style.display = 'block';
+                }
+                break;
+        }
+    }
+});
+</script>
+{% endblock %} 

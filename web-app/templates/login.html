@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Login - TechFlow{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <div class="logo-icon mx-auto mb-3">
+                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                </div>
+                <h2 class="mb-2">Welcome Back</h2>
+                <p class="text-muted">Sign in to your TechFlow account</p>
+            </div>
+
+            <form method="POST" novalidate>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username or Email</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username" 
+                           name="username" 
+                           required 
+                           placeholder="Enter your username or email"
+                           autocomplete="username">
+                    <div class="invalid-feedback" style="display: none;">
+                        Please enter your username or email.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           required 
+                           placeholder="Enter your password"
+                           autocomplete="current-password">
+                    <div class="invalid-feedback" style="display: none;">
+                        Please enter your password.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="mb-0">
+                    Don't have an account? 
+                    <a href="{{ url_for('register') }}" class="text-primary">Sign up</a>
+                </p>
+            </div>
+            
+            <!-- Test Credentials for Development -->
+            <div class="mt-4 p-3 bg-light rounded">
+                <small class="text-muted">
+                    <strong>Test Credentials:</strong><br>
+                    Username: <code>admin</code><br>
+                    Password: <code>admin123</code>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--gray-50) 100%);
+}
+
+.form-card {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+}
+
+.form-card .card-body {
+    padding: 2rem;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.form-control {
+    height: 48px;
+    font-size: 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-fast);
+}
+
+.form-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.btn-lg {
+    height: 48px;
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+@media (max-height: 600px) {
+    .form-container {
+        padding: 0.5rem;
+    }
+    
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    console.log('Login form found:', form); // Debug log
+    
+    // Add click event listener to the submit button for debugging
+    const submitBtn = form.querySelector('button[type="submit"]');
+    console.log('Login submit button found:', submitBtn); // Debug log
+    
+    submitBtn.addEventListener('click', function(e) {
+        console.log('Login submit button clicked'); // Debug log
+        console.log('Button type:', this.type); // Debug log
+        console.log('Form action:', form.action); // Debug log
+        console.log('Form method:', form.method); // Debug log
+        
+        // Force form submission if the event doesn't trigger naturally
+        setTimeout(() => {
+            console.log('Attempting to force login form submission...'); // Debug log
+            form.submit();
+        }, 100);
+    });
+    
+    form.addEventListener('submit', function(event) {
+        console.log('Login form submission event triggered'); // Debug log
+        
+        // Get form elements
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const usernameFeedback = username.nextElementSibling;
+        const passwordFeedback = password.nextElementSibling;
+        
+        console.log('Login form elements found:', {
+            username: username?.value,
+            password: password?.value ? '***' : 'empty'
+        }); // Debug log
+        
+        let isValid = true;
+        
+        // Validate username
+        if (!username.value.trim()) {
+            username.classList.add('is-invalid');
+            usernameFeedback.style.display = 'block';
+            isValid = false;
+        } else {
+            username.classList.remove('is-invalid');
+            username.classList.add('is-valid');
+            usernameFeedback.style.display = 'none';
+        }
+        
+        // Validate password
+        if (!password.value.trim()) {
+            password.classList.add('is-invalid');
+            passwordFeedback.style.display = 'block';
+            isValid = false;
+        } else {
+            password.classList.remove('is-invalid');
+            password.classList.add('is-valid');
+            passwordFeedback.style.display = 'none';
+        }
+        
+        console.log('Login validation result:', isValid); // Debug log
+        
+        if (!isValid) {
+            // Prevent form submission if validation fails
+            console.log('Login validation failed, preventing submission'); // Debug log
+            event.preventDefault();
+            return;
+        }
+        
+        console.log('Login validation passed, allowing submission'); // Debug log
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+        submitBtn.disabled = true;
+        
+        // Form will submit naturally
+    });
+    
+    // Clear validation on input
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                this.classList.remove('is-invalid');
+                const feedback = this.nextElementSibling;
+                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                    feedback.style.display = 'none';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

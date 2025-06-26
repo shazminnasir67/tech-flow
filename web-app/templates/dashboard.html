@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TechFlow{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="mb-2">
+                            <i class="fas fa-tachometer-alt text-primary"></i> 
+                            Welcome back, {{ user.full_name or user.username }}!
+                        </h2>
+                        <p class="text-muted mb-0">
+                            Here's what's happening with your projects and team
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="{{ url_for('projects') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> New Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ stats.total_projects }}</div>
+                    <div class="stats-label">Total Projects</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ stats.active_tasks }}</div>
+                    <div class="stats-label">Active Tasks</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ stats.completed_tasks }}</div>
+                    <div class="stats-label">Completed Tasks</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ stats.team_memberships }}</div>
+                    <div class="stats-label">Team Memberships</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Projects and Tasks -->
+<div class="row mb-5">
+    <!-- My Projects -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-folder"></i> My Projects
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if user_projects %}
+                <div class="list-group list-group-flush">
+                    {% for project in user_projects %}
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ project.name }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> {{ project.created_at.strftime('%b %d, %Y') }}
+                                </small>
+                            </div>
+                            <span class="badge badge-success">{{ project.status }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No projects yet</p>
+                    <a href="{{ url_for('projects') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Create Project
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Projects -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-users"></i> Team Projects
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if team_projects %}
+                <div class="list-group list-group-flush">
+                    {% for project in team_projects %}
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ project.name }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ project.owner.username }}
+                                </small>
+                            </div>
+                            <span class="badge badge-info">Team</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No team projects yet</p>
+                    <p class="text-muted small">Join a team to collaborate on projects</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity and Tasks -->
+<div class="row">
+    <!-- Recent Activity -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history"></i> Recent Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if activities %}
+                <div class="timeline">
+                    {% for activity in activities %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <i class="fas fa-circle text-primary"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">{{ activity.activity_type|title }}</h6>
+                            <p class="text-muted mb-0">{{ activity.description }}</p>
+                            <small class="text-muted">
+                                {{ activity.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent activity</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Tasks -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tasks"></i> My Tasks
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if assigned_tasks %}
+                <div class="list-group list-group-flush">
+                    {% for task in assigned_tasks %}
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ task.title }}</h6>
+                                <small class="text-muted">{{ task.project.name }}</small>
+                                {% if task.due_date %}
+                                <br>
+                                <small class="text-warning">
+                                    <i class="fas fa-calendar"></i> Due: {{ task.due_date.strftime('%b %d') }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            <span class="badge badge-{{ 'warning' if task.status == 'todo' else 'info' if task.status == 'in_progress' else 'success' }}">
+                                {{ task.status|replace('_', ' ')|title }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No tasks assigned</p>
+                    <p class="text-muted small">You're all caught up!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('projects') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-folder-plus"></i> Create Project
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-user-edit"></i> Edit Profile
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100" onclick="refreshPage()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-marker i {
+    font-size: 6px;
+    color: var(--primary-600);
+}
+
+.timeline-content {
+    background: var(--gray-50);
+    padding: 15px;
+    border-radius: var(--radius-lg);
+    border-left: 3px solid var(--primary-500);
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-200);
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, var(--primary-50), var(--gray-50));
+}
+
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.list-group-item {
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--gray-50);
+}
+</style>
+
+<script>
+function refreshPage() {
+    location.reload();
+}
+
+// Auto-refresh dashboard every 30 seconds
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %} 

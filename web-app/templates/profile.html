@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - TechFlow{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-4 mb-4">
+        <div class="card border-0">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-circle"></i> Profile Information
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <!-- Avatar -->
+                <div class="mb-4">
+                    {% if user.avatar_url %}
+                    <img src="{{ user.avatar_url }}" alt="{{ user.full_name or user.username }}" 
+                         class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center" 
+                         style="width: 120px; height: 120px;">
+                        <i class="fas fa-user fa-3x text-white"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- User Info -->
+                <h4 class="mb-2">{{ user.full_name or user.username }}</h4>
+                <p class="text-muted mb-3">@{{ user.username }}</p>
+                
+                {% if user.bio %}
+                <p class="text-muted mb-3">{{ user.bio }}</p>
+                {% endif %}
+                
+                <!-- Role Badge -->
+                <span class="badge badge-{{ 'primary' if user.role == 'admin' else 'success' if user.role == 'manager' else 'info' }} mb-3">
+                    {{ user.role|title }}
+                </span>
+                
+                <!-- Member Since -->
+                <div class="text-muted small">
+                    <i class="fas fa-calendar"></i> Member since {{ user.created_at.strftime('%B %Y') }}
+                </div>
+                
+                <!-- Edit Profile Button -->
+                <button class="btn btn-primary mt-3" onclick="editProfile()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contact Information -->
+        <div class="card border-0 mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-envelope"></i> Contact Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <i class="fas fa-envelope text-muted"></i>
+                    </div>
+                    <div class="col-9">
+                        <strong>Email:</strong><br>
+                        <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                    </div>
+                </div>
+                
+                {% if user.last_login %}
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <i class="fas fa-clock text-muted"></i>
+                    </div>
+                    <div class="col-9">
+                        <strong>Last Login:</strong><br>
+                        {{ user.last_login.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if user.last_active %}
+                <div class="row">
+                    <div class="col-3">
+                        <i class="fas fa-circle text-success"></i>
+                    </div>
+                    <div class="col-9">
+                        <strong>Last Active:</strong><br>
+                        {{ user.last_active.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Account Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ user.projects|length }}</div>
+                    <div class="stats-label">Projects</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ user.team_memberships|length }}</div>
+                    <div class="stats-label">Teams</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card text-center">
+                    <div class="stats-number">{{ user.activities|length }}</div>
+                    <div class="stats-label">Activities</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Projects -->
+        <div class="card border-0 mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-folder"></i> Recent Projects
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if user.projects %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in user.projects[:5] %}
+                            <tr>
+                                <td>
+                                    <strong>{{ project.name }}</strong>
+                                    {% if project.description %}
+                                    <br><small class="text-muted">{{ project.description[:50] }}...</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ 'success' if project.status == 'active' else 'warning' if project.status == 'archived' else 'info' }}">
+                                        {{ project.status|title }}
+                                    </span>
+                                </td>
+                                <td>{{ project.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No projects yet</p>
+                    <a href="{{ url_for('new_project') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Project
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card border-0 mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history"></i> Recent Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if user.activities %}
+                <div class="timeline">
+                    {% for activity in user.activities[:10] %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <i class="fas fa-circle text-primary"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">{{ activity.activity_type|title }}</h6>
+                            <p class="text-muted mb-0">{{ activity.description }}</p>
+                            <small class="text-muted">
+                                {{ activity.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent activity</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Account Settings -->
+        <div class="card border-0">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cog"></i> Account Settings
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary w-100" onclick="changePassword()">
+                            <i class="fas fa-key"></i> Change Password
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-info w-100" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-warning w-100" onclick="notificationSettings()">
+                            <i class="fas fa-bell"></i> Notifications
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-danger w-100" onclick="deleteAccount()">
+                            <i class="fas fa-trash"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editFullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" 
+                                   value="{{ user.full_name or '' }}" maxlength="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editUsername" 
+                                   value="{{ user.username }}" readonly>
+                            <div class="form-text">Username cannot be changed</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" 
+                                   value="{{ user.email }}" maxlength="120">
+                        </div>
+                        <div class="col-12">
+                            <label for="editBio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="editBio" rows="3" 
+                                      maxlength="500">{{ user.bio or '' }}</textarea>
+                            <div class="form-text">Tell us about yourself</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-xl);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-50), var(--gray-50));
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-marker i {
+    font-size: 6px;
+    color: var(--primary-600);
+}
+
+.timeline-content {
+    background: var(--gray-50);
+    padding: 15px;
+    border-radius: var(--radius-lg);
+    border-left: 3px solid var(--primary-500);
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-200);
+}
+
+.table th {
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-700);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+}
+
+.g-3 {
+    gap: var(--space-3);
+}
+</style>
+
+<script>
+function editProfile() {
+    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+    modal.show();
+}
+
+function saveProfile() {
+    // Simulate saving profile
+    const fullName = document.getElementById('editFullName').value;
+    const email = document.getElementById('editEmail').value;
+    const bio = document.getElementById('editBio').value;
+    
+    // Show success message
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show';
+    alert.innerHTML = `
+        <i class="fas fa-check-circle"></i> Profile updated successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+    modal.hide();
+    
+    // Update display
+    document.querySelector('h4').textContent = fullName || '{{ user.username }}';
+}
+
+function changePassword() {
+    alert('Change password functionality would be implemented here');
+}
+
+function exportData() {
+    const userData = {
+        username: '{{ user.username }}',
+        email: '{{ user.email }}',
+        fullName: '{{ user.full_name or "" }}',
+        bio: '{{ user.bio or "" }}',
+        memberSince: '{{ user.created_at.strftime("%Y-%m-%d") }}',
+        projects: {{ user.projects|length }},
+        activities: {{ user.activities|length }}
+    };
+    
+    const dataStr = JSON.stringify(userData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'techflow-profile-data.json';
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    
+    // Show success message
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show';
+    alert.innerHTML = `
+        <i class="fas fa-check-circle"></i> Data exported successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+}
+
+function notificationSettings() {
+    alert('Notification settings would be implemented here');
+}
+
+function deleteAccount() {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        alert('Account deletion would be implemented here');
+    }
+}
+
+// Auto-refresh profile data every 60 seconds
+setTimeout(function() {
+    location.reload();
+}, 60000);
+</script>
+{% endblock %} 

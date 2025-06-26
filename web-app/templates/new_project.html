@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Project - TechFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-plus-circle text-primary"></i> Create New Project
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-4">
+                        <!-- Project Name -->
+                        <div class="col-12">
+                            <label for="name" class="form-label">Project Name *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   name="name" 
+                                   required 
+                                   placeholder="Enter project name"
+                                   maxlength="100">
+                            <div class="form-text">Choose a descriptive name for your project</div>
+                        </div>
+                        
+                        <!-- Project Description -->
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="4"
+                                      placeholder="Describe your project, its goals, and key features"
+                                      maxlength="500"></textarea>
+                            <div class="form-text">Provide a brief description of your project</div>
+                        </div>
+                        
+                        <!-- Repository URL -->
+                        <div class="col-12">
+                            <label for="repository_url" class="form-label">Repository URL</label>
+                            <input type="url" 
+                                   class="form-control" 
+                                   id="repository_url" 
+                                   name="repository_url" 
+                                   placeholder="https://github.com/username/project-name">
+                            <div class="form-text">Link to your Git repository (optional)</div>
+                        </div>
+                        
+                        <!-- Visibility -->
+                        <div class="col-md-6">
+                            <label for="visibility" class="form-label">Visibility *</label>
+                            <select class="form-control" id="visibility" name="visibility" required>
+                                <option value="">Select visibility</option>
+                                <option value="private">Private</option>
+                                <option value="public">Public</option>
+                                <option value="team">Team</option>
+                            </select>
+                            <div class="form-text">Who can see this project</div>
+                        </div>
+                        
+                        <!-- Project Type -->
+                        <div class="col-md-6">
+                            <label for="project_type" class="form-label">Project Type</label>
+                            <select class="form-control" id="project_type" name="project_type">
+                                <option value="">Select type</option>
+                                <option value="web-app">Web Application</option>
+                                <option value="mobile-app">Mobile Application</option>
+                                <option value="api">API/Backend</option>
+                                <option value="library">Library/Package</option>
+                                <option value="tool">Development Tool</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="form-text">Type of project (optional)</div>
+                        </div>
+                        
+                        <!-- Tags -->
+                        <div class="col-12">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="tags" 
+                                   name="tags" 
+                                   placeholder="python, flask, web, api (comma separated)">
+                            <div class="form-text">Add tags to help others discover your project</div>
+                        </div>
+                        
+                        <!-- Advanced Options -->
+                        <div class="col-12">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-cog"></i> Advanced Options
+                                    </h6>
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="enable_issues" name="enable_issues" checked>
+                                                <label class="form-check-label" for="enable_issues">
+                                                    Enable Issue Tracking
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="enable_wiki" name="enable_wiki">
+                                                <label class="form-check-label" for="enable_wiki">
+                                                    Enable Wiki
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="enable_analytics" name="enable_analytics" checked>
+                                                <label class="form-check-label" for="enable_analytics">
+                                                    Enable Analytics
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="auto_backup" name="auto_backup" checked>
+                                                <label class="form-check-label" for="auto_backup">
+                                                    Auto Backup
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex gap-3 justify-content-end">
+                                <a href="{{ url_for('projects') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create Project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card border-0 mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle text-info"></i> Need Help?
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-lightbulb text-warning"></i> Best Practices</h6>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-2"></i>Use descriptive project names</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Write clear descriptions</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Add relevant tags</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Choose appropriate visibility</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle text-info"></i> Visibility Options</h6>
+                        <ul class="list-unstyled small">
+                            <li><strong>Private:</strong> Only you and invited team members</li>
+                            <li><strong>Public:</strong> Visible to everyone on TechFlow</li>
+                            <li><strong>Team:</strong> Visible to your team members</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-xl);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-50), var(--gray-50));
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.form-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 0.2rem var(--primary-100);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+.bg-light {
+    background-color: var(--gray-50) !important;
+}
+
+.btn {
+    font-weight: var(--font-weight-medium);
+}
+
+.gap-3 {
+    gap: var(--space-3);
+}
+</style>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.needs-validation');
+    console.log('New project form found:', form); // Debug log
+    
+    // Add click event listener to the submit button for debugging
+    const submitBtn = form.querySelector('button[type="submit"]');
+    console.log('New project submit button found:', submitBtn); // Debug log
+    
+    submitBtn.addEventListener('click', function(e) {
+        console.log('New project submit button clicked'); // Debug log
+        console.log('Button type:', this.type); // Debug log
+        console.log('Form action:', form.action); // Debug log
+        console.log('Form method:', form.method); // Debug log
+        
+        // Force form submission if the event doesn't trigger naturally
+        setTimeout(() => {
+            console.log('Attempting to force new project form submission...'); // Debug log
+            form.submit();
+        }, 100);
+    });
+    
+    form.addEventListener('submit', function(event) {
+        console.log('New project form submission event triggered'); // Debug log
+        
+        // Get form elements
+        const name = document.getElementById('name');
+        const visibility = document.getElementById('visibility');
+        
+        console.log('New project form elements found:', {
+            name: name?.value,
+            visibility: visibility?.value
+        }); // Debug log
+        
+        if (!form.checkValidity()) {
+            console.log('New project validation failed, preventing submission'); // Debug log
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        console.log('New project validation passed, allowing submission'); // Debug log
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Project...';
+        submitBtn.disabled = true;
+        
+        // Form will submit naturally
+    });
+    
+    // Character counter for description
+    const description = document.getElementById('description');
+    const descriptionCounter = document.createElement('div');
+    descriptionCounter.className = 'form-text text-end';
+    description.parentNode.appendChild(descriptionCounter);
+    
+    function updateCounter() {
+        const remaining = 500 - description.value.length;
+        descriptionCounter.textContent = `${remaining} characters remaining`;
+        descriptionCounter.className = `form-text text-end ${remaining < 50 ? 'text-warning' : 'text-muted'}`;
+    }
+    
+    description.addEventListener('input', updateCounter);
+    updateCounter();
+    
+    // Auto-suggest tags based on project type
+    const projectType = document.getElementById('project_type');
+    const tags = document.getElementById('tags');
+    
+    projectType.addEventListener('change', function() {
+        const suggestions = {
+            'web-app': 'web, frontend, javascript, html, css',
+            'mobile-app': 'mobile, ios, android, react-native, flutter',
+            'api': 'api, backend, rest, graphql, database',
+            'library': 'library, package, npm, pip, composer',
+            'tool': 'tool, cli, automation, devops, utility'
+        };
+        
+        if (suggestions[this.value]) {
+            tags.value = suggestions[this.value];
+        }
+    });
+    
+    // Preview project name
+    const nameInput = document.getElementById('name');
+    const namePreview = document.createElement('div');
+    namePreview.className = 'form-text';
+    nameInput.parentNode.appendChild(namePreview);
+    
+    nameInput.addEventListener('input', function() {
+        if (this.value) {
+            namePreview.textContent = `Project URL: techflow.com/projects/${this.value.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+        } else {
+            namePreview.textContent = '';
+        }
+    });
+});
+</script>
+{% endblock %} 

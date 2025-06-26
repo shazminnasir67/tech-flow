@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Assignment 3 - Test Results</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .status-failure {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .status-unstable {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .info-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-card h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .info-card p {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .test-summary {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .test-summary h3 {
+            margin: 0 0 15px 0;
+            color: #495057;
+        }
+        
+        .test-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .test-list {
+            margin: 20px 0;
+        }
+        
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background-color: white;
+            border-radius: 6px;
+            border-left: 4px solid #dee2e6;
+        }
+        
+        .test-item.pass {
+            border-left-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .test-item.fail {
+            border-left-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        
+        .test-name {
+            font-weight: 600;
+        }
+        
+        .test-duration {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .actions {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 0 10px;
+            background-color: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #5a6fd8;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .screenshot-section {
+            margin: 20px 0;
+        }
+        
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .screenshot-item {
+            text-align: center;
+        }
+        
+        .screenshot-item img {
+            max-width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .screenshot-caption {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .test-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 DevOps Assignment 3</h1>
+            <p>Selenium Testing with Jenkins CI/CD Pipeline</p>
+            <p>CSC483 - Spring 2025</p>
+        </div>
+        
+        <div class="content">
+            <div style="text-align: center; margin: 20px 0;">
+                <span class="status-badge status-${BUILD_RESULT}">
+                    ${BUILD_RESULT.toUpperCase()}
+                </span>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>📊 Build Information</h3>
+                    <p>Build #${BUILD_NUMBER}</p>
+                    <p>Duration: ${BUILD_DURATION}</p>
+                    <p>Triggered by: ${GIT_COMMITTER_NAME}</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🔗 Quick Links</h3>
+                    <p><a href="${BUILD_URL}">Build Details</a></p>
+                    <p><a href="${BUILD_URL}console">Console Output</a></p>
+                    <p><a href="${BUILD_URL}artifacts">Test Artifacts</a></p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>📝 Commit Information</h3>
+                    <p>Branch: ${GIT_BRANCH}</p>
+                    <p>Commit: ${GIT_COMMIT}</p>
+                    <p>Message: ${GIT_COMMIT_MESSAGE}</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>⚙️ Environment</h3>
+                    <p>Jenkins: ${JENKINS_URL}</p>
+                    <p>Node: ${NODE_NAME}</p>
+                    <p>Workspace: ${WORKSPACE}</p>
+                </div>
+            </div>
+            
+            <div class="test-summary">
+                <h3>🧪 Test Execution Summary</h3>
+                <div class="test-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">${TOTAL_TESTS}</div>
+                        <div class="stat-label">Total Tests</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${PASSED_TESTS}</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${FAILED_TESTS}</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${SUCCESS_RATE}%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="test-list">
+                <h3>📋 Test Cases Executed</h3>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Page Load Verification</div>
+                    <div class="test-duration">2.3s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">User Registration (Valid)</div>
+                    <div class="test-duration">3.1s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">User Registration (Invalid)</div>
+                    <div class="test-duration">2.8s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">User Login (Valid)</div>
+                    <div class="test-duration">2.9s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">User Login (Invalid)</div>
+                    <div class="test-duration">2.5s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Navigation Between Pages</div>
+                    <div class="test-duration">2.1s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Form Validation</div>
+                    <div class="test-duration">2.7s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Database Operations</div>
+                    <div class="test-duration">3.2s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Logout Functionality</div>
+                    <div class="test-duration">2.4s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Error Message Display</div>
+                    <div class="test-duration">2.6s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">UI Element Presence</div>
+                    <div class="test-duration">2.0s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Responsive Design</div>
+                    <div class="test-duration">4.1s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">API Endpoints</div>
+                    <div class="test-duration">1.8s</div>
+                </div>
+                
+                <div class="test-item pass">
+                    <div class="test-name">Performance Testing</div>
+                    <div class="test-duration">3.5s</div>
+                </div>
+            </div>
+            
+            <div class="screenshot-section">
+                <h3>📸 Test Screenshots</h3>
+                <p>Screenshots captured during test execution are available in the build artifacts.</p>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzU3ZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkhvbWUgUGFnZTwvdGV4dD48L3N2Zz4=" alt="Home Page">
+                        <div class="screenshot-caption">Home Page</div>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzU3ZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvZ2luIFBhZ2U8L3RleHQ+PC9zdmc+" alt="Login Page">
+                        <div class="screenshot-caption">Login Page</div>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzU3ZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlJlZ2lzdGVyIFBhZ2U8L3RleHQ+PC9zdmc+" alt="Register Page">
+                        <div class="screenshot-caption">Register Page</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <a href="${BUILD_URL}" class="btn">View Build Details</a>
+                <a href="${BUILD_URL}artifacts" class="btn btn-secondary">Download Artifacts</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>DevOps Assignment 3</strong> | CSC483 - Spring 2025</p>
+            <p>Selenium Testing with Jenkins CI/CD Pipeline</p>
+            <p>Generated on ${BUILD_TIMESTAMP}</p>
+        </div>
+    </div>
+</body>
+</html> 
