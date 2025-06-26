@@ -1,0 +1,178 @@
+pipeline {
+    agent any
+    
+    environment {
+        WEB_APP_URL = 'http://localhost:5000'
+        TEST_DIR = 'selenium-tests'
+        SCREENSHOTS_DIR = 'screenshots'
+        REPORTS_DIR = 'reports'
+        EMAIL_RECIPIENTS = 'shazminnasir481@gmail.com, qasimalik@gmail.com'
+        EMAIL_SUBJECT = 'TechFlow - DevOps Assignment 3 - Test Results'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Starting TechFlow CI/CD Pipeline"
+                echo "Build Number: ${BUILD_NUMBER}"
+                
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/main"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [
+                        [$class: 'CleanBeforeCheckout'],
+                        [$class: 'CleanCheckout']
+                    ],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/shazminnasir67/tech-flow.git'
+                    ]]
+                ])
+                
+                echo "Code checkout completed"
+            }
+        }
+        
+        stage('Environment Setup') {
+            steps {
+                echo "Setting up test environment..."
+                
+                sh '''
+                    mkdir -p ${SCREENSHOTS_DIR}
+                    mkdir -p ${REPORTS_DIR}
+                    mkdir -p ${WORKSPACE}/logs
+                '''
+                
+                sh '''
+                    python3 --version
+                    pip3 --version
+                '''
+                
+                sh '''
+                    sudo apt-get update -qq
+                    sudo apt-get install -y -qq \
+                        python3-pip \
+                        python3-venv \
+                        chromium-browser \
+                        chromium-chromedriver \
+                        wget \
+                        curl
+                '''
+            }
+        }
+        
+        stage('Web Application Setup') {
+            steps {
+                echo "Setting up Flask web application..."
+                
+                dir('web-app') {
+                    sh '''
+                        python3 -m venv venv
+                        source venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
+                    
+                    sh '''
+                        source venv/bin/activate
+                        python app.py > ../logs/web-app.log 2>&1 &
+                        echo $! > ../web-app.pid
+                    '''
+                    
+                    sh '''
+                        sleep 10
+                        curl -f http://localhost:5000/api/health || exit 1
+                    '''
+                    
+                    echo "Web application started successfully"
+                }
+            }
+        }
+        
+        stage('Test Dependencies') {
+            steps {
+                echo "Installing test dependencies..."
+                
+                dir('selenium-tests') {
+                    sh '''
+                        python3 -m venv test-venv
+                        source test-venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
+                    
+                    sh '''
+                        source test-venv/bin/activate
+                        python -c "import selenium; print(f'Selenium version: {selenium.__version__}')"
+                    '''
+                }
+            }
+        }
+        
+        stage('Run Selenium Tests') {
+            steps {
+                echo "Executing Selenium test suite..."
+                
+                dir('selenium-tests') {
+                    withEnv([
+                        "BASE_URL=${WEB_APP_URL}",
+                        "HEADLESS=true",
+                        "SCREENSHOTS_DIR=${WORKSPACE}/${SCREENSHOTS_DIR}",
+                        "REPORTS_DIR=${WORKSPACE}/${REPORTS_DIR}"
+                    ]) {
+                        sh '''
+                            source test-venv/bin/activate
+                            python test_suite.py > ../logs/test-execution.log 2>&1
+                        '''
+                    }
+                    
+                    sh '''
+                        if [ -f test_results.json ]; then
+                            echo "Test results file found"
+                            cat test_results.json
+                        else
+                            echo "No test results file found"
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+            
+            post {
+                always {
+                    archiveArtifacts(
+                        artifacts: "${SCREENSHOTS_DIR}/**/*, ${REPORTS_DIR}/**/*, logs/**/*, selenium-tests/test_results.json",
+                        allowEmptyArchive: true
+                    )
+                }
+            }
+        }
+        
+        stage('Cleanup') {
+            steps {
+                echo "Cleaning up environment..."
+                
+                sh '''
+                    if [ -f web-app.pid ]; then
+                        kill $(cat web-app.pid) || true
+                        rm web-app.pid
+                    fi
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "Pipeline completed"
+            echo "Build Status: ${currentBuild.result}"
+        }
+        success {
+            echo "Pipeline succeeded!"
+        }
+        failure {
+            echo "Pipeline failed!"
+        }
+    }
+} 
