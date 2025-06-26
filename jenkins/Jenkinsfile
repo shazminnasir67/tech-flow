@@ -16,8 +16,8 @@ pipeline {
         DOCKER_CONTAINER = 'selenium-tests'
         
         // Email Configuration
-        EMAIL_RECIPIENTS = 'devops@assignment.com, admin@assignment.com'
-        EMAIL_SUBJECT = 'DevOps Assignment 3 - Test Results'
+        EMAIL_RECIPIENTS = 'shazminnasir481@gmail.com, qasimalik@gmail.com'
+        EMAIL_SUBJECT = 'TechFlow - DevOps Assignment 3 - Test Results'
         
         // Git Configuration
         GIT_REPO = 'https://github.com/shazminnasir67/tech-flow.git'
