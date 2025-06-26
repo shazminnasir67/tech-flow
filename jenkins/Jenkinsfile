@@ -210,14 +210,6 @@ pipeline {
                             artifacts: "${SCREENSHOTS_DIR}/**/*, ${REPORTS_DIR}/**/*, logs/**/*, selenium-tests/test_results.json",
                             allowEmptyArchive: true
                         )
-                        
-                        // Publish test results
-                        if (fileExists('selenium-tests/test_results.json')) {
-                            publishJSON([
-                                jsonPath: 'selenium-tests/test_results.json',
-                                reportName: 'Selenium Test Results'
-                            ])
-                        }
                     }
                 }
             }
