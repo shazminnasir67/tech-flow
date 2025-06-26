@@ -20,7 +20,7 @@ pipeline {
         EMAIL_SUBJECT = 'DevOps Assignment 3 - Test Results'
         
         // Git Configuration
-        GIT_REPO = 'https://github.com/your-username/devops-assignment-3.git'
+        GIT_REPO = 'https://github.com/shazminnasir67/tech-flow.git'
         GIT_BRANCH = 'main'
     }
     
