@@ -104,9 +104,12 @@ pipeline {
                         python3 -m pip --version
                     '''
                     
-                    // Install Python packages using pip
+                    // Create virtual environment for global packages
                     sh '''
-                        python3 -m pip install --user selenium webdriver-manager pytest
+                        python3 -m venv ${WORKSPACE}/venv
+                        source ${WORKSPACE}/venv/bin/activate
+                        python3 -m pip install --upgrade pip
+                        python3 -m pip install selenium webdriver-manager pytest
                     '''
                 }
             }
@@ -118,13 +121,15 @@ pipeline {
                     echo "Setting up Flask web application..."
                     
                     dir('web-app') {
-                        // Install Flask dependencies
+                        // Install Flask dependencies in virtual environment
                         sh '''
-                            python3 -m pip install --user -r requirements.txt
+                            source ${WORKSPACE}/venv/bin/activate
+                            python3 -m pip install -r requirements.txt
                         '''
                         
                         // Start web application in background
                         sh '''
+                            source ${WORKSPACE}/venv/bin/activate
                             python3 app.py > ../logs/web-app.log 2>&1 &
                             echo $! > ../web-app.pid
                         '''
@@ -147,13 +152,15 @@ pipeline {
                     echo "Installing test dependencies..."
                     
                     dir('selenium-tests') {
-                        // Install test dependencies
+                        // Install test dependencies in virtual environment
                         sh '''
-                            python3 -m pip install --user -r requirements.txt
+                            source ${WORKSPACE}/venv/bin/activate
+                            python3 -m pip install -r requirements.txt
                         '''
                         
                         // Verify Selenium installation
                         sh '''
+                            source ${WORKSPACE}/venv/bin/activate
                             python3 -c "import selenium; print(f'Selenium version: {selenium.__version__}')"
                         '''
                     }
@@ -176,6 +183,7 @@ pipeline {
                         ]) {
                             // Run test suite
                             sh '''
+                                source ${WORKSPACE}/venv/bin/activate
                                 python3 test_suite.py > ../logs/test-execution.log 2>&1
                             '''
                         }
