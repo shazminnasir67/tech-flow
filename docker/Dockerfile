@@ -28,14 +28,10 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add
     && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver using webdriver-manager
-RUN pip install --no-cache-dir webdriver-manager \
-    && python -c "from webdriver_manager.chrome import ChromeDriverManager; ChromeDriverManager().install()"
-
 # Copy requirements files
 COPY selenium-tests/requirements.txt /app/requirements.txt
 
-# Install Python dependencies
+# Install Python dependencies (webdriver-manager will handle ChromeDriver)
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
