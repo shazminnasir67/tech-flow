@@ -45,7 +45,7 @@ RUN mkdir -p /app/screenshots \
     && mkdir -p /app/logs
 
 # Set environment variables for tests
-ENV BASE_URL=http://localhost:5000
+ENV BASE_URL=http://13.51.201.77:5000
 ENV HEADLESS=true
 ENV SCREENSHOTS_DIR=/app/screenshots
 ENV REPORTS_DIR=/app/reports
@@ -59,7 +59,7 @@ USER testuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/api/health || exit 1
+    CMD curl -f http://13.51.201.77:5000/api/health || exit 1
 
 # Default command
 CMD ["python", "/app/selenium-tests/test_suite.py"] 

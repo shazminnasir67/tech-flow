@@ -23,6 +23,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 import json
 import logging
+import requests
 
 # Configure logging
 logging.basicConfig(
@@ -43,6 +44,28 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         """Set up test environment once for all tests."""
         logger.info("Setting up test environment...")
         
+        # Test configuration
+        cls.base_url = "http://13.51.201.77:5000"
+        cls.test_results = []
+        cls.screenshots_dir = "screenshots"
+        
+        # Create screenshots directory
+        if not os.path.exists(cls.screenshots_dir):
+            os.makedirs(cls.screenshots_dir)
+        
+        # Test connection to web application
+        logger.info(f"Testing connection to web application at {cls.base_url}")
+        try:
+            response = requests.get(f"{cls.base_url}/api/health", timeout=10)
+            logger.info(f"Health check response: {response.status_code} - {response.text}")
+            if response.status_code != 200:
+                logger.error(f"Health check failed with status code: {response.status_code}")
+                raise Exception(f"Web application health check failed: {response.status_code}")
+        except Exception as e:
+            logger.error(f"Failed to connect to web application: {e}")
+            logger.error("Please ensure the Flask application is running on the EC2 instance")
+            raise
+        
         # Chrome options for headless testing
         chrome_options = Options()
         chrome_options.add_argument("--headless")
@@ -53,21 +76,22 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         
         # Use webdriver-manager to handle ChromeDriver
-        service = Service(ChromeDriverManager().install())
+        try:
+            service = Service(ChromeDriverManager().install())
+            logger.info("ChromeDriver installed successfully")
+        except Exception as e:
+            logger.error(f"Failed to install ChromeDriver: {e}")
+            raise
         
         # Initialize WebDriver
-        cls.driver = webdriver.Chrome(service=service, options=chrome_options)
-        cls.driver.implicitly_wait(10)
-        cls.wait = WebDriverWait(cls.driver, 10)
-        
-        # Test configuration
-        cls.base_url = "http://localhost:5000"
-        cls.test_results = []
-        cls.screenshots_dir = "screenshots"
-        
-        # Create screenshots directory
-        if not os.path.exists(cls.screenshots_dir):
-            os.makedirs(cls.screenshots_dir)
+        try:
+            cls.driver = webdriver.Chrome(service=service, options=chrome_options)
+            cls.driver.implicitly_wait(10)
+            cls.wait = WebDriverWait(cls.driver, 10)
+            logger.info("WebDriver initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize WebDriver: {e}")
+            raise
         
         logger.info("Test environment setup completed")
     
