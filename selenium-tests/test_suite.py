@@ -735,8 +735,8 @@ def run_test_suite():
     # Create test suite
     suite = unittest.TestLoader().loadTestsFromTestCase(DevOpsAssignmentTestSuite)
     
-    # Run tests
-    runner = unittest.TextTestRunner(verbosity=2)
+    # Run tests with detailed output
+    runner = unittest.TextTestRunner(verbosity=3, stream=sys.stdout)
     result = runner.run(suite)
     
     # Generate summary
@@ -755,7 +755,28 @@ def run_test_suite():
     logger.info(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
     logger.info("=" * 60)
     
-    return result
+    # Print detailed failure information
+    if result.failures:
+        logger.error("FAILURES:")
+        for test, traceback in result.failures:
+            logger.error(f"Test: {test}")
+            logger.error(f"Traceback: {traceback}")
+            logger.error("-" * 40)
+    
+    if result.errors:
+        logger.error("ERRORS:")
+        for test, traceback in result.errors:
+            logger.error(f"Test: {test}")
+            logger.error(f"Traceback: {traceback}")
+            logger.error("-" * 40)
+    
+    # Exit with appropriate code
+    if failed_tests > 0 or error_tests > 0:
+        logger.error("Test suite failed!")
+        sys.exit(1)
+    else:
+        logger.info("Test suite passed!")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
