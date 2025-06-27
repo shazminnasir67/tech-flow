@@ -187,7 +187,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         # Test home page
         self.driver.get(self.base_url)
         self.wait_for_element(By.TAG_NAME, "body")
-        self.assertIn("DevOps Assignment 3", self.driver.title)
+        self.assertIn("TechFlow", self.driver.title)
         self.take_screenshot("home_page")
         
         # Test login page
@@ -199,7 +199,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         # Test register page
         self.driver.get(f"{self.base_url}/register")
         self.wait_for_element(By.ID, "username")
-        self.assertIn("Register", self.driver.title)
+        self.assertIn("Sign Up", self.driver.title)
         self.take_screenshot("register_page")
         
         logger.info("Page load verification completed successfully")
@@ -284,7 +284,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button.click()
         
         # Verify error message
-        self.wait_for_text_present("Password must be at least 6 characters long")
+        self.wait_for_text_present("Password must be at least 8 characters long")
         self.take_screenshot("registration_password_error")
         
         logger.info("User registration with invalid data completed successfully")
@@ -385,7 +385,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.take_screenshot("navigation_to_login")
         
         # Navigate to register page
-        register_link = self.wait_for_element_clickable(By.LINK_TEXT, "Register Now")
+        register_link = self.wait_for_element_clickable(By.LINK_TEXT, "Sign up")
         register_link.click()
         self.assertIn("register", self.driver.current_url)
         self.take_screenshot("navigation_to_register")
@@ -593,7 +593,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.wait_for_element(By.CLASS_NAME, "navbar")
         self.wait_for_element(By.LINK_TEXT, "Home")
         self.wait_for_element(By.LINK_TEXT, "Login")
-        self.wait_for_element(By.LINK_TEXT, "Register")
+        self.wait_for_element(By.LINK_TEXT, "Sign Up")
         
         # Check for main content elements
         self.wait_for_element(By.TAG_NAME, "h1")
@@ -609,7 +609,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.wait_for_element(By.ID, "username")
         self.wait_for_element(By.ID, "password")
         self.wait_for_element(By.CSS_SELECTOR, "button[type='submit']")
-        self.wait_for_element(By.LINK_TEXT, "Register Now")
+        self.wait_for_element(By.LINK_TEXT, "Sign up")
         
         self.take_screenshot("ui_elements_login")
         
@@ -623,7 +623,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.wait_for_element(By.ID, "confirm_password")
         self.wait_for_element(By.ID, "terms")
         self.wait_for_element(By.CSS_SELECTOR, "button[type='submit']")
-        self.wait_for_element(By.LINK_TEXT, "Login Here")
+        self.wait_for_element(By.LINK_TEXT, "Sign in")
         
         self.take_screenshot("ui_elements_register")
         
@@ -687,17 +687,19 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         except json.JSONDecodeError:
             self.fail("Health check endpoint did not return valid JSON")
         
-        # Test user count endpoint
-        self.driver.get(f"{self.base_url}/api/users/count")
+        # Test stats endpoint
+        self.driver.get(f"{self.base_url}/api/stats")
         
         body_text = self.driver.find_element(By.TAG_NAME, "body").text
         try:
-            count_data = json.loads(body_text)
-            self.assertIn('user_count', count_data)
-            self.assertIsInstance(count_data['user_count'], int)
-            self.take_screenshot("api_user_count")
+            stats_data = json.loads(body_text)
+            self.assertIn('total_users', stats_data)
+            self.assertIn('total_projects', stats_data)
+            self.assertIsInstance(stats_data['total_users'], int)
+            self.assertIsInstance(stats_data['total_projects'], int)
+            self.take_screenshot("api_stats")
         except json.JSONDecodeError:
-            self.fail("User count endpoint did not return valid JSON")
+            self.fail("Stats endpoint did not return valid JSON")
         
         logger.info("API endpoints testing completed successfully")
 
