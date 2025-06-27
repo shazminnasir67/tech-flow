@@ -14,6 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import os
 
 def test_connectivity():
     """Test basic connectivity to the web application."""
@@ -68,8 +69,24 @@ def test_selenium_basic():
         
         # Use webdriver-manager to handle ChromeDriver
         print("1. Installing ChromeDriver...")
-        service = Service(ChromeDriverManager().install())
-        print("   ✓ ChromeDriver installed successfully")
+        driver_path = ChromeDriverManager().install()
+        print(f"   ChromeDriver path: {driver_path}")
+        
+        # Check if the path is correct and executable
+        if os.path.exists(driver_path):
+            print(f"   ✓ ChromeDriver file exists: {driver_path}")
+        else:
+            print(f"   ✗ ChromeDriver file not found: {driver_path}")
+            # Try to find the correct chromedriver executable
+            driver_dir = os.path.dirname(driver_path)
+            for file in os.listdir(driver_dir):
+                if file.startswith('chromedriver') and not file.endswith('.txt') and not file.endswith('.md'):
+                    driver_path = os.path.join(driver_dir, file)
+                    print(f"   Found chromedriver executable: {driver_path}")
+                    break
+        
+        service = Service(driver_path)
+        print("   ✓ ChromeDriver service created")
         
         # Initialize WebDriver
         print("2. Initializing WebDriver...")

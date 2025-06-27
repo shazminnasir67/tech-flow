@@ -115,7 +115,27 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         # Use webdriver-manager to handle ChromeDriver
         try:
             test_results_logger.info("Installing ChromeDriver...")
-            service = Service(ChromeDriverManager().install())
+            driver_path = ChromeDriverManager().install()
+            logger.info(f"ChromeDriver path: {driver_path}")
+            test_results_logger.info(f"ChromeDriver path: {driver_path}")
+            
+            # Check if the path is correct and executable
+            if os.path.exists(driver_path):
+                logger.info(f"ChromeDriver file exists: {driver_path}")
+                test_results_logger.info(f"✓ ChromeDriver file exists: {driver_path}")
+            else:
+                logger.warning(f"ChromeDriver file not found: {driver_path}")
+                test_results_logger.warning(f"ChromeDriver file not found: {driver_path}")
+                # Try to find the correct chromedriver executable
+                driver_dir = os.path.dirname(driver_path)
+                for file in os.listdir(driver_dir):
+                    if file.startswith('chromedriver') and not file.endswith('.txt') and not file.endswith('.md'):
+                        driver_path = os.path.join(driver_dir, file)
+                        logger.info(f"Found chromedriver executable: {driver_path}")
+                        test_results_logger.info(f"Found chromedriver executable: {driver_path}")
+                        break
+            
+            service = Service(driver_path)
             logger.info("ChromeDriver installed successfully")
             test_results_logger.info("✓ ChromeDriver installed successfully")
         except Exception as e:
