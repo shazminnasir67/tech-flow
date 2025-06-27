@@ -304,7 +304,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button.click()
         
         # Verify successful registration
-        self.wait_for_text_present("Registration successful")
+        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
         self.assertIn("login", self.driver.current_url)
         self.take_screenshot("registration_success")
         
@@ -384,7 +384,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button.click()
         
         # Wait for registration success and redirect to login
-        self.wait_for_text_present("Registration successful")
+        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
         
         # Now test login
         username_field = self.wait_for_element(By.ID, "username")
@@ -530,7 +530,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button.click()
         
         # Verify registration success
-        self.wait_for_text_present("Registration successful")
+        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
         self.take_screenshot("database_registration")
         
         # Login with the same credentials to verify database persistence
