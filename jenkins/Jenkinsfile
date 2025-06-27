@@ -3,16 +3,7 @@ pipeline {
     
     environment {
         // Application Configuration - EC2 Public IP
-        WEB_APP_URL = 'http://13.                        # Start web application in background with proper binding
-                        sh '''
-                            . ${WORKSPACE}/venv/bin/activate
-                            echo "Starting Flask application on 0.0.0.0:5000..."
-                            export FLASK_HOST=0.0.0.0
-                            export FLASK_PORT=5000
-                            python3 app.py > ../logs/web-app.log 2>&1 &
-                            echo $! > ../web-app.pid
-                            echo "Flask app started with PID: $(cat ../web-app.pid)"
-                        '''7:5000'
+        WEB_APP_URL = 'http://13.51.201.77:5000'
         BASE_URL = 'http://13.51.201.77:5000'
         
         // Test Configuration
