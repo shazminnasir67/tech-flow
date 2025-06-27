@@ -243,6 +243,22 @@ pipeline {
             }
         }
         
+        stage('Simple Test') {
+            steps {
+                script {
+                    echo "Running simple test to verify basic functionality..."
+                    
+                    dir('selenium-tests') {
+                        // Run simple test without complex logging
+                        sh '''
+                            . ${WORKSPACE}/venv/bin/activate
+                            python3 simple_test.py
+                        '''
+                    }
+                }
+            }
+        }
+        
         stage('Run Selenium Tests') {
             steps {
                 script {

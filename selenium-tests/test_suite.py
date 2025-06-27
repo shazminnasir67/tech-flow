@@ -31,7 +31,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('test_execution.log'),
-        logging.FileHandler('detailed_errors.log', level=logging.ERROR),
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -43,6 +42,19 @@ test_results_logger.setLevel(logging.INFO)
 fh = logging.FileHandler('test_results_detailed.log')
 fh.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
 test_results_logger.addHandler(fh)
+
+# Add file handler for error-only logging
+error_logger = logging.getLogger('error_logger')
+error_logger.setLevel(logging.ERROR)
+error_fh = logging.FileHandler('detailed_errors.log')
+error_fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+error_logger.addHandler(error_fh)
+
+# Also log errors to the main logger
+def log_error(message):
+    """Log error to both main logger and error logger."""
+    logger.error(message)
+    error_logger.error(message)
 
 class DevOpsAssignmentTestSuite(unittest.TestCase):
     """Main test suite for DevOps Assignment 3 web application."""
@@ -83,6 +95,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         except Exception as e:
             logger.error(f"Failed to connect to web application: {e}")
             test_results_logger.error(f"Failed to connect to web application: {e}")
+            log_error(f"Failed to connect to web application: {e}")
             logger.error("Please ensure the Flask application is running on the EC2 instance")
             test_results_logger.error("Please ensure the Flask application is running on the EC2 instance")
             raise
@@ -108,6 +121,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         except Exception as e:
             logger.error(f"Failed to install ChromeDriver: {e}")
             test_results_logger.error(f"Failed to install ChromeDriver: {e}")
+            log_error(f"Failed to install ChromeDriver: {e}")
             raise
         
         # Initialize WebDriver
@@ -121,6 +135,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         except Exception as e:
             logger.error(f"Failed to initialize WebDriver: {e}")
             test_results_logger.error(f"Failed to initialize WebDriver: {e}")
+            log_error(f"Failed to initialize WebDriver: {e}")
             raise
         
         logger.info("Test environment setup completed")
