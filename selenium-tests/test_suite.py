@@ -284,13 +284,15 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         # Navigate to registration page
         self.driver.get(f"{self.base_url}/register")
         
-        # Fill registration form
+        # Fill registration form - note the form has full_name field
+        full_name_field = self.wait_for_element(By.ID, "full_name")
         username_field = self.wait_for_element(By.ID, "username")
         email_field = self.wait_for_element(By.ID, "email")
         password_field = self.wait_for_element(By.ID, "password")
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         terms_checkbox = self.wait_for_element(By.ID, "terms")
         
+        self.clear_and_fill_input(full_name_field, f"Test User {test_data['username']}")
         self.clear_and_fill_input(username_field, test_data['username'])
         self.clear_and_fill_input(email_field, test_data['email'])
         self.clear_and_fill_input(password_field, test_data['password'])
@@ -303,7 +305,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button = self.wait_for_element_clickable(By.CSS_SELECTOR, "button[type='submit']")
         submit_button.click()
         
-        # Verify successful registration
+        # Verify successful registration - exact message from Flask app
         self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
         self.assertIn("login", self.driver.current_url)
         self.take_screenshot("registration_success")
@@ -320,11 +322,13 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.get(f"{self.base_url}/register")
         
         # Test with invalid username (too short)
+        full_name_field = self.wait_for_element(By.ID, "full_name")
         username_field = self.wait_for_element(By.ID, "username")
         email_field = self.wait_for_element(By.ID, "email")
         password_field = self.wait_for_element(By.ID, "password")
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         
+        self.clear_and_fill_input(full_name_field, "Test User")
         self.clear_and_fill_input(username_field, test_data['invalid_username'])
         self.clear_and_fill_input(email_field, test_data['email'])
         self.clear_and_fill_input(password_field, test_data['password'])
@@ -336,7 +340,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button = self.wait_for_element_clickable(By.CSS_SELECTOR, "button[type='submit']")
         submit_button.click()
         
-        # Verify error message
+        # Verify error message - exact message from Flask app
         self.wait_for_text_present("Username must be at least 3 characters long")
         self.take_screenshot("registration_username_error")
         
@@ -345,7 +349,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.clear_and_fill_input(email_field, test_data['invalid_email'])
         submit_button.click()
         
-        # Verify error message
+        # Verify error message - exact message from Flask app
         self.wait_for_text_present("Please enter a valid email address")
         self.take_screenshot("registration_email_error")
         
@@ -354,7 +358,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.clear_and_fill_input(password_field, test_data['invalid_password'])
         submit_button.click()
         
-        # Verify error message
+        # Verify error message - exact message from Flask app
         self.wait_for_text_present("Password must be at least 8 characters long")
         self.take_screenshot("registration_password_error")
         
@@ -368,12 +372,14 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         test_data = self.generate_test_data()
         self.driver.get(f"{self.base_url}/register")
         
+        full_name_field = self.wait_for_element(By.ID, "full_name")
         username_field = self.wait_for_element(By.ID, "username")
         email_field = self.wait_for_element(By.ID, "email")
         password_field = self.wait_for_element(By.ID, "password")
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         terms_checkbox = self.wait_for_element(By.ID, "terms")
         
+        self.clear_and_fill_input(full_name_field, f"Test User {test_data['username']}")
         self.clear_and_fill_input(username_field, test_data['username'])
         self.clear_and_fill_input(email_field, test_data['email'])
         self.clear_and_fill_input(password_field, test_data['password'])
@@ -399,8 +405,8 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button = self.wait_for_element_clickable(By.CSS_SELECTOR, "button[type='submit']")
         submit_button.click()
         
-        # Verify successful login
-        self.wait_for_text_present(f"Welcome back, {test_data['username']}")
+        # Verify successful login - exact message from Flask app
+        self.wait_for_text_present(f"Welcome back, Test User {test_data['username']}")
         self.assertIn("dashboard", self.driver.current_url)
         self.take_screenshot("login_success")
         
@@ -426,7 +432,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button = self.wait_for_element_clickable(By.CSS_SELECTOR, "button[type='submit']")
         submit_button.click()
         
-        # Verify error message
+        # Verify error message - exact message from Flask app
         self.wait_for_text_present("Invalid username or password")
         self.take_screenshot("login_error_message")
         
@@ -435,7 +441,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.clear_and_fill_input(password_field, "")
         submit_button.click()
         
-        # Verify error message
+        # Verify error message - exact message from Flask app
         self.wait_for_text_present("Please enter both username and password")
         self.take_screenshot("login_empty_fields")
         
@@ -514,12 +520,14 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         # Register a new user
         self.driver.get(f"{self.base_url}/register")
         
+        full_name_field = self.wait_for_element(By.ID, "full_name")
         username_field = self.wait_for_element(By.ID, "username")
         email_field = self.wait_for_element(By.ID, "email")
         password_field = self.wait_for_element(By.ID, "password")
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         terms_checkbox = self.wait_for_element(By.ID, "terms")
         
+        self.clear_and_fill_input(full_name_field, f"Test User {test_data['username']}")
         self.clear_and_fill_input(username_field, test_data['username'])
         self.clear_and_fill_input(email_field, test_data['email'])
         self.clear_and_fill_input(password_field, test_data['password'])
@@ -544,7 +552,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button.click()
         
         # Verify successful login (database verification)
-        self.wait_for_text_present(f"Welcome back, {test_data['username']}")
+        self.wait_for_text_present(f"Welcome back, Test User {test_data['username']}")
         self.assertIn("dashboard", self.driver.current_url)
         self.take_screenshot("database_login_verification")
         
@@ -559,12 +567,14 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         
         # Register and login
         self.driver.get(f"{self.base_url}/register")
+        full_name_field = self.wait_for_element(By.ID, "full_name")
         username_field = self.wait_for_element(By.ID, "username")
         email_field = self.wait_for_element(By.ID, "email")
         password_field = self.wait_for_element(By.ID, "password")
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         terms_checkbox = self.wait_for_element(By.ID, "terms")
         
+        self.clear_and_fill_input(full_name_field, f"Test User {test_data['username']}")
         self.clear_and_fill_input(username_field, test_data['username'])
         self.clear_and_fill_input(email_field, test_data['email'])
         self.clear_and_fill_input(password_field, test_data['password'])
@@ -573,6 +583,9 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         
         submit_button = self.wait_for_element_clickable(By.CSS_SELECTOR, "button[type='submit']")
         submit_button.click()
+        
+        # Wait for registration success
+        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
         
         # Login
         username_field = self.wait_for_element(By.ID, "username")
@@ -585,7 +598,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         submit_button.click()
         
         # Verify login success
-        self.wait_for_text_present(f"Welcome back, {test_data['username']}")
+        self.wait_for_text_present(f"Welcome back, Test User {test_data['username']}")
         
         # Test logout
         logout_link = self.wait_for_element_clickable(By.LINK_TEXT, "Logout")
@@ -611,11 +624,13 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.get(f"{self.base_url}/register")
         
         # Try to register with existing username (if any)
+        full_name_field = self.wait_for_element(By.ID, "full_name")
         username_field = self.wait_for_element(By.ID, "username")
         email_field = self.wait_for_element(By.ID, "email")
         password_field = self.wait_for_element(By.ID, "password")
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         
+        self.clear_and_fill_input(full_name_field, "Test User")
         self.clear_and_fill_input(username_field, "testuser")
         self.clear_and_fill_input(email_field, "test@example.com")
         self.clear_and_fill_input(password_field, "password123")
@@ -688,6 +703,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.get(f"{self.base_url}/register")
         
         # Check for form elements
+        self.wait_for_element(By.ID, "full_name")
         self.wait_for_element(By.ID, "username")
         self.wait_for_element(By.ID, "email")
         self.wait_for_element(By.ID, "password")
