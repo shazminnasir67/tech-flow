@@ -72,18 +72,20 @@ def test_selenium_basic():
         driver_path = ChromeDriverManager().install()
         print(f"   ChromeDriver path: {driver_path}")
         
-        # Check if the path is correct and executable
-        if os.path.exists(driver_path):
-            print(f"   ✓ ChromeDriver file exists: {driver_path}")
-        else:
-            print(f"   ✗ ChromeDriver file not found: {driver_path}")
-            # Try to find the correct chromedriver executable
-            driver_dir = os.path.dirname(driver_path)
-            for file in os.listdir(driver_dir):
-                if file.startswith('chromedriver') and not file.endswith('.txt') and not file.endswith('.md'):
-                    driver_path = os.path.join(driver_dir, file)
+        # Find the real chromedriver executable
+        driver_dir = os.path.dirname(driver_path)
+        found_driver = False
+        for file in os.listdir(driver_dir):
+            if file == 'chromedriver' or file == 'chromedriver.exe':
+                candidate = os.path.join(driver_dir, file)
+                if os.access(candidate, os.X_OK):
+                    driver_path = candidate
+                    found_driver = True
                     print(f"   Found chromedriver executable: {driver_path}")
                     break
+        if not found_driver:
+            print("   ✗ Could not find a valid chromedriver executable in the directory!")
+            return False
         
         service = Service(driver_path)
         print("   ✓ ChromeDriver service created")

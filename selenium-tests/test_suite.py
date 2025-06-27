@@ -119,21 +119,23 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             logger.info(f"ChromeDriver path: {driver_path}")
             test_results_logger.info(f"ChromeDriver path: {driver_path}")
             
-            # Check if the path is correct and executable
-            if os.path.exists(driver_path):
-                logger.info(f"ChromeDriver file exists: {driver_path}")
-                test_results_logger.info(f"✓ ChromeDriver file exists: {driver_path}")
-            else:
-                logger.warning(f"ChromeDriver file not found: {driver_path}")
-                test_results_logger.warning(f"ChromeDriver file not found: {driver_path}")
-                # Try to find the correct chromedriver executable
-                driver_dir = os.path.dirname(driver_path)
-                for file in os.listdir(driver_dir):
-                    if file.startswith('chromedriver') and not file.endswith('.txt') and not file.endswith('.md'):
-                        driver_path = os.path.join(driver_dir, file)
+            # Find the real chromedriver executable
+            driver_dir = os.path.dirname(driver_path)
+            found_driver = False
+            for file in os.listdir(driver_dir):
+                if file == 'chromedriver' or file == 'chromedriver.exe':
+                    candidate = os.path.join(driver_dir, file)
+                    if os.access(candidate, os.X_OK):
+                        driver_path = candidate
+                        found_driver = True
                         logger.info(f"Found chromedriver executable: {driver_path}")
                         test_results_logger.info(f"Found chromedriver executable: {driver_path}")
                         break
+            if not found_driver:
+                logger.error("Could not find a valid chromedriver executable in the directory!")
+                test_results_logger.error("Could not find a valid chromedriver executable in the directory!")
+                log_error("Could not find a valid chromedriver executable in the directory!")
+                raise Exception("No valid chromedriver executable found")
             
             service = Service(driver_path)
             logger.info("ChromeDriver installed successfully")
