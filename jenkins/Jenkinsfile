@@ -272,6 +272,28 @@ pipeline {
                                 echo "No test results file found"
                                 exit 1
                             fi
+                            
+                            # Display detailed logs
+                            echo "=== DETAILED ERROR LOG ==="
+                            if [ -f detailed_errors.log ]; then
+                                cat detailed_errors.log
+                            else
+                                echo "No detailed errors log found"
+                            fi
+                            
+                            echo "=== TEST RESULTS DETAILED LOG ==="
+                            if [ -f test_results_detailed.log ]; then
+                                cat test_results_detailed.log
+                            else
+                                echo "No detailed test results log found"
+                            fi
+                            
+                            echo "=== TEST EXECUTION LOG ==="
+                            if [ -f test_execution.log ]; then
+                                cat test_execution.log
+                            else
+                                echo "No test execution log found"
+                            fi
                         '''
                     }
                 }
@@ -282,7 +304,7 @@ pipeline {
                     script {
                         // Archive test artifacts
                         archiveArtifacts(
-                            artifacts: "${SCREENSHOTS_DIR}/**/*, ${REPORTS_DIR}/**/*, logs/**/*, selenium-tests/test_results.json",
+                            artifacts: "${SCREENSHOTS_DIR}/**/*, ${REPORTS_DIR}/**/*, logs/**/*, selenium-tests/test_results.json, selenium-tests/test_results_detailed.json, selenium-tests/detailed_errors.log, selenium-tests/test_results_detailed.log, selenium-tests/test_execution.log",
                             allowEmptyArchive: true
                         )
                     }
