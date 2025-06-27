@@ -251,6 +251,50 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             'invalid_password': '123'  # Too short
         }
 
+    def test_00_flask_app_health_check(self):
+        """Test 0: Verify Flask app is running and healthy."""
+        logger.info("Testing Flask app health check...")
+        
+        # Test health endpoint
+        self.driver.get(f"{self.base_url}/api/health")
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        logger.info(f"Health check response: {body_text}")
+        
+        # Parse JSON response
+        try:
+            import json
+            health_data = json.loads(body_text)
+            self.assertEqual(health_data['status'], 'healthy')
+            self.assertIn('database', health_data)
+            logger.info("✓ Health check passed")
+        except json.JSONDecodeError:
+            self.fail("Health check endpoint did not return valid JSON")
+        
+        # Test database functionality
+        self.driver.get(f"{self.base_url}/test")
+        test_body = self.driver.find_element(By.TAG_NAME, "body").text
+        logger.info(f"Test endpoint response: {test_body}")
+        
+        try:
+            test_data = json.loads(test_body)
+            self.assertIn('total_users', test_data)
+            self.assertIn('users', test_data)
+            logger.info(f"✓ Database test passed - {test_data['total_users']} users found")
+        except json.JSONDecodeError:
+            self.fail("Test endpoint did not return valid JSON")
+        
+        # Test home page loads
+        self.driver.get(self.base_url)
+        self.assertIn("TechFlow", self.driver.title)
+        logger.info("✓ Home page loads correctly")
+        
+        # Test register page loads
+        self.driver.get(f"{self.base_url}/register")
+        self.assertIn("Sign Up", self.driver.title)
+        logger.info("✓ Register page loads correctly")
+        
+        logger.info("Flask app health check completed successfully")
+
     def test_01_page_load_verification(self):
         """Test 1: Verify all pages load correctly."""
         logger.info("Testing page load verification...")
@@ -273,6 +317,11 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.assertIn("Sign Up", self.driver.title)
         self.take_screenshot("register_page")
         
+        # Test API health endpoint
+        self.driver.get(f"{self.base_url}/api/health")
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        logger.info(f"Health check response: {body_text}")
+        
         logger.info("Page load verification completed successfully")
 
     def test_02_user_registration_valid_data(self):
@@ -292,18 +341,78 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         confirm_password_field = self.wait_for_element(By.ID, "confirm_password")
         terms_checkbox = self.wait_for_element(By.ID, "terms")
         
+        # Fill form fields with valid data
         self.clear_and_fill_input(full_name_field, f"Test User {test_data['username']}")
         self.clear_and_fill_input(username_field, test_data['username'])
         self.clear_and_fill_input(email_field, test_data['email'])
         self.clear_and_fill_input(password_field, test_data['password'])
         self.clear_and_fill_input(confirm_password_field, test_data['password'])
+        
+        # Click terms checkbox
         terms_checkbox.click()
+        
+        # Trigger validation by clicking on each field and then clicking away
+        full_name_field.click()
+        username_field.click()
+        email_field.click()
+        password_field.click()
+        confirm_password_field.click()
+        
+        # Wait a moment for validation to complete
+        time.sleep(1)
         
         self.take_screenshot("registration_form_filled")
         
-        # Submit form
+        # Submit form using JavaScript to bypass any potential issues
         submit_button = self.wait_for_element_clickable(By.CSS_SELECTOR, "button[type='submit']")
-        submit_button.click()
+        
+        # Try multiple submission methods
+        try:
+            # Method 1: Direct click
+            submit_button.click()
+            logger.info("Form submitted via direct click")
+        except Exception as e:
+            logger.warning(f"Direct click failed: {e}")
+            try:
+                # Method 2: JavaScript click
+                self.driver.execute_script("arguments[0].click();", submit_button)
+                logger.info("Form submitted via JavaScript click")
+            except Exception as e2:
+                logger.warning(f"JavaScript click failed: {e2}")
+                # Method 3: Form submit via JavaScript
+                form = self.driver.find_element(By.TAG_NAME, "form")
+                self.driver.execute_script("arguments[0].submit();", form)
+                logger.info("Form submitted via JavaScript form.submit()")
+        
+        # Add debugging to see what's happening
+        logger.info("Form submitted, waiting for response...")
+        time.sleep(3)  # Wait a bit longer for the response
+        
+        # Log current URL and page title
+        logger.info(f"Current URL after submission: {self.driver.current_url}")
+        logger.info(f"Page title after submission: {self.driver.title}")
+        
+        # Check if there are any error messages
+        try:
+            error_elements = self.driver.find_elements(By.CLASS_NAME, "alert-danger")
+            if error_elements:
+                for error in error_elements:
+                    logger.error(f"Error message found: {error.text}")
+        except Exception as e:
+            logger.info(f"No error elements found: {e}")
+        
+        # Check if there are any success messages
+        try:
+            success_elements = self.driver.find_elements(By.CLASS_NAME, "alert-success")
+            if success_elements:
+                for success in success_elements:
+                    logger.info(f"Success message found: {success.text}")
+        except Exception as e:
+            logger.info(f"No success elements found: {e}")
+        
+        # Log page source for debugging
+        logger.info("Page source after form submission:")
+        logger.info(self.driver.page_source[:1000])  # First 1000 characters
         
         # Verify successful registration - exact message from Flask app
         self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
