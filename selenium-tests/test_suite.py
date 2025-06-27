@@ -45,7 +45,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         logger.info("Setting up test environment...")
         
         # Test configuration
-        cls.base_url = "http://13.51.201.77:5000"
+        cls.base_url = "http://localhost:5000"
         cls.test_results = []
         cls.screenshots_dir = "screenshots"
         

@@ -10,7 +10,7 @@ import time
 
 def test_connection():
     """Test connection to the web application."""
-    base_url = "http://13.51.201.77:5000"
+    base_url = "http://localhost:5000"
     
     print(f"Testing connection to {base_url}")
     

@@ -3,8 +3,8 @@ pipeline {
     
     environment {
         // Application Configuration
-        WEB_APP_URL = 'http://13.51.201.77:5000'
-        BASE_URL = 'http://13.51.201.77:5000'
+        WEB_APP_URL = 'http://localhost:5000'
+        BASE_URL = 'http://localhost:5000'
         
         // Test Configuration
         TEST_DIR = 'selenium-tests'
@@ -127,17 +127,60 @@ pipeline {
                             python3 -m pip install -r requirements.txt
                         '''
                         
-                        // Start web application in background
+                        // Check if Flask app is already running and kill it
                         sh '''
-                            . ${WORKSPACE}/venv/bin/activate
-                            python3 app.py > ../logs/web-app.log 2>&1 &
-                            echo $! > ../web-app.pid
+                            if [ -f ../web-app.pid ]; then
+                                echo "Killing existing Flask app process..."
+                                kill $(cat ../web-app.pid) 2>/dev/null || true
+                                rm ../web-app.pid
+                            fi
                         '''
                         
-                        // Wait for application to start
+                        // Start web application in background with better logging
                         sh '''
-                            sleep 10
-                            curl -f http://13.51.201.77:5000/api/health || exit 1
+                            . ${WORKSPACE}/venv/bin/activate
+                            echo "Starting Flask application..."
+                            python3 app.py > ../logs/web-app.log 2>&1 &
+                            echo $! > ../web-app.pid
+                            echo "Flask app started with PID: $(cat ../web-app.pid)"
+                        '''
+                        
+                        // Wait for application to start with retries
+                        sh '''
+                            echo "Waiting for Flask application to start..."
+                            for i in {1..30}; do
+                                echo "Attempt $i: Checking if Flask app is running..."
+                                if curl -f http://localhost:5000/api/health > /dev/null 2>&1; then
+                                    echo "Flask application is running successfully!"
+                                    curl http://localhost:5000/api/health
+                                    break
+                                fi
+                                if [ $i -eq 30 ]; then
+                                    echo "Flask application failed to start after 30 attempts"
+                                    echo "Web app log contents:"
+                                    cat ../logs/web-app.log
+                                    exit 1
+                                fi
+                                sleep 2
+                            done
+                        '''
+                        
+                        // Verify the process is still running
+                        sh '''
+                            if [ -f ../web-app.pid ]; then
+                                PID=$(cat ../web-app.pid)
+                                if ps -p $PID > /dev/null; then
+                                    echo "Flask app process $PID is still running"
+                                else
+                                    echo "Flask app process $PID is not running"
+                                    echo "Web app log contents:"
+                                    cat ../logs/web-app.log
+                                    exit 1
+                                fi
+                            else
+                                echo "No PID file found"
+                                exit 1
+                            fi
                         '''
                         
                         echo "Web application started successfully"
@@ -396,24 +439,41 @@ EOF
                 script {
                     echo "Cleaning up test environment..."
                     
-                    // Stop web application
+                    // Stop web application with better logging
                     sh '''
+                        echo "Stopping Flask web application..."
                         if [ -f web-app.pid ]; then
-                            kill $(cat web-app.pid) 2>/dev/null || true
+                            PID=$(cat web-app.pid)
+                            echo "Killing Flask app process $PID"
+                            kill $PID 2>/dev/null || true
+                            sleep 2
+                            if ps -p $PID > /dev/null 2>&1; then
+                                echo "Force killing Flask app process $PID"
+                                kill -9 $PID 2>/dev/null || true
+                            fi
                             rm web-app.pid
+                            echo "Flask app stopped"
+                        else
+                            echo "No PID file found for Flask app"
                         fi
+                        
+                        # Also check for any remaining Python processes running app.py
+                        echo "Checking for any remaining Flask processes..."
+                        pkill -f "python3 app.py" 2>/dev/null || true
                     '''
                     
                     // Clean up Docker containers
                     sh '''
+                        echo "Cleaning up Docker containers..."
                         docker stop ${DOCKER_CONTAINER} 2>/dev/null || true
                         docker rm ${DOCKER_CONTAINER} 2>/dev/null || true
                     '''
                     
                     // Clean up temporary files
                     sh '''
-                        rm -rf selenium-tests/test-venv
-                        rm -rf web-app/venv
+                        echo "Cleaning up temporary files..."
+                        rm -rf selenium-tests/test-venv 2>/dev/null || true
+                        rm -rf web-app/venv 2>/dev/null || true
                     '''
                     
                     echo "Cleanup completed"
@@ -425,6 +485,18 @@ EOF
     post {
         always {
             script {
+                // Always stop Flask app if it's running
+                sh '''
+                    echo "Post-build cleanup: Stopping Flask app..."
+                    if [ -f web-app.pid ]; then
+                        PID=$(cat web-app.pid)
+                        echo "Killing Flask app process $PID"
+                        kill $PID 2>/dev/null || true
+                        rm web-app.pid
+                    fi
+                    pkill -f "python3 app.py" 2>/dev/null || true
+                '''
+                
                 // Always archive artifacts
                 archiveArtifacts(
                     artifacts: "${SCREENSHOTS_DIR}/**/*, ${REPORTS_DIR}/**/*, logs/**/*",
