@@ -234,6 +234,12 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             EC.presence_of_element_located((By.XPATH, f"//*[contains(text(), '{text}')]"))
         )
     
+    def wait_for_alert_message(self, message, alert_type="success", timeout=15):
+        """Wait for alert message to be present in page."""
+        return WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located((By.XPATH, f"//div[contains(@class, 'alert-{alert_type}') and contains(text(), '{message}')]"))
+        )
+    
     def clear_and_fill_input(self, element, text):
         """Clear input field and fill with text."""
         element.clear()
@@ -408,7 +414,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         
         # Verify successful registration - exact message from Flask app
         # The message appears on the login page after redirect, so wait for it there
-        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
+        self.wait_for_alert_message("Registration successful! Welcome to TechFlow.", "success")
         self.assertIn("login", self.driver.current_url)
         self.take_screenshot("registration_success")
         
@@ -446,7 +452,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Verify error message - exact message from Flask app
-        self.wait_for_text_present("Username must be at least 3 characters long")
+        self.wait_for_alert_message("Username must be at least 3 characters long", "danger")
         self.take_screenshot("registration_username_error")
         
         # Test with invalid email
@@ -466,7 +472,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Verify error message - exact message from Flask app
-        self.wait_for_text_present("Please enter a valid email address")
+        self.wait_for_alert_message("Please enter a valid email address", "danger")
         self.take_screenshot("registration_email_error")
         
         # Test with invalid password (too short)
@@ -486,7 +492,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Verify error message - exact message from Flask app
-        self.wait_for_text_present("Password must be at least 8 characters long")
+        self.wait_for_alert_message("Password must be at least 8 characters long", "danger")
         self.take_screenshot("registration_password_error")
         
         logger.info("User registration with invalid data completed successfully")
@@ -521,7 +527,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Wait for registration success and redirect to login page
-        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
+        self.wait_for_alert_message("Registration successful! Welcome to TechFlow.", "success")
         self.assertIn("login", self.driver.current_url)
         
         # Now test login
@@ -567,7 +573,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Verify error message - exact message from Flask app
-        self.wait_for_text_present("Invalid username or password")
+        self.wait_for_alert_message("Invalid username or password", "danger")
         self.take_screenshot("login_error_message")
         
         # Test with empty fields
@@ -581,7 +587,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Verify error message - exact message from Flask app
-        self.wait_for_text_present("Please enter both username and password")
+        self.wait_for_alert_message("Please enter both username and password", "danger")
         self.take_screenshot("login_empty_fields")
         
         logger.info("User login with invalid credentials completed successfully")
@@ -732,7 +738,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.driver.execute_script(js_code)
         
         # Wait for registration success and redirect to login page
-        self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
+        self.wait_for_alert_message("Registration successful! Welcome to TechFlow.", "success")
         self.assertIn("login", self.driver.current_url)
         
         # Login
@@ -752,13 +758,13 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         logout_link.click()
         
         # Verify logout success
-        self.wait_for_text_present("You have been logged out successfully")
+        self.wait_for_alert_message("You have been logged out successfully", "success")
         self.assertIn("index", self.driver.current_url)
         self.take_screenshot("logout_success")
         
         # Verify user is redirected to login when trying to access dashboard
         self.driver.get(f"{self.base_url}/dashboard")
-        self.wait_for_text_present("Please login to access the dashboard")
+        self.wait_for_alert_message("Please login to access the dashboard", "danger")
         self.take_screenshot("logout_redirect_verification")
         
         logger.info("Logout functionality completed successfully")
