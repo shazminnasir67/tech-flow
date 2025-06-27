@@ -120,45 +120,54 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             test_results_logger.info(f"ChromeDriver path: {driver_path}")
             
             # Find the real chromedriver executable
-            driver_dir = os.path.dirname(driver_path)
-            logger.info(f"Looking in directory: {driver_dir}")
-            test_results_logger.info(f"Looking in directory: {driver_dir}")
+            base_dir = os.path.dirname(driver_path)
+            logger.info(f"Base directory: {base_dir}")
+            test_results_logger.info(f"Base directory: {base_dir}")
             
-            # Check if we need to look in a subdirectory (like chromedriver-linux64)
-            subdirs = [d for d in os.listdir(driver_dir) if os.path.isdir(os.path.join(driver_dir, d)) and 'chromedriver' in d.lower()]
+            # The actual chromedriver is usually in a subdirectory
+            # Look for directories that might contain the executable
             actual_driver_path = None
             
-            if subdirs:
-                # Look in the subdirectory first
-                subdir = os.path.join(driver_dir, subdirs[0])
-                logger.info(f"Checking subdirectory: {subdir}")
-                test_results_logger.info(f"Checking subdirectory: {subdir}")
-                for file in os.listdir(subdir):
-                    if file == 'chromedriver' or file == 'chromedriver.exe':
-                        candidate = os.path.join(subdir, file)
-                        if os.access(candidate, os.X_OK):
-                            actual_driver_path = candidate
-                            logger.info(f"Found chromedriver executable: {actual_driver_path}")
-                            test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
-                            break
-            
-            # If not found in subdirectory, check the main directory
-            if not actual_driver_path:
-                logger.info(f"Checking main directory: {driver_dir}")
-                test_results_logger.info(f"Checking main directory: {driver_dir}")
-                for file in os.listdir(driver_dir):
-                    if file == 'chromedriver' or file == 'chromedriver.exe':
-                        candidate = os.path.join(driver_dir, file)
-                        if os.access(candidate, os.X_OK):
-                            actual_driver_path = candidate
-                            logger.info(f"Found chromedriver executable: {actual_driver_path}")
-                            test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
+            # First, check if we're already in the right directory
+            if os.path.basename(driver_path) == 'chromedriver' and os.access(driver_path, os.X_OK):
+                actual_driver_path = driver_path
+                logger.info(f"Found chromedriver executable: {actual_driver_path}")
+                test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
+            else:
+                # Look for subdirectories
+                for item in os.listdir(base_dir):
+                    item_path = os.path.join(base_dir, item)
+                    if os.path.isdir(item_path):
+                        logger.info(f"Checking subdirectory: {item_path}")
+                        test_results_logger.info(f"Checking subdirectory: {item_path}")
+                        # Look for chromedriver executable in this subdirectory
+                        for file in os.listdir(item_path):
+                            if file == 'chromedriver':
+                                candidate = os.path.join(item_path, file)
+                                if os.access(candidate, os.X_OK):
+                                    actual_driver_path = candidate
+                                    logger.info(f"Found chromedriver executable: {actual_driver_path}")
+                                    test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
+                                    break
+                        if actual_driver_path:
                             break
             
             if not actual_driver_path:
                 logger.error("Could not find a valid chromedriver executable!")
                 test_results_logger.error("Could not find a valid chromedriver executable!")
                 log_error("Could not find a valid chromedriver executable!")
+                logger.error(f"Available files in {base_dir}:")
+                for item in os.listdir(base_dir):
+                    item_path = os.path.join(base_dir, item)
+                    if os.path.isdir(item_path):
+                        logger.error(f"  Directory: {item}")
+                        try:
+                            for subitem in os.listdir(item_path):
+                                logger.error(f"    - {subitem}")
+                        except:
+                            logger.error(f"    - (cannot list contents)")
+                    else:
+                        logger.error(f"  File: {item}")
                 raise Exception("No valid chromedriver executable found")
             
             service = Service(actual_driver_path)
