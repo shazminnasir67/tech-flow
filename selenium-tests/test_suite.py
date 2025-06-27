@@ -48,12 +48,13 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         """Set up test environment once for all tests."""
         logger.info("Setting up test environment...")
         
-        # Test configuration
-        cls.base_url = "http://localhost:5000"
+        # Test configuration - Use environment variable or default to EC2 IP
+        cls.base_url = os.getenv('BASE_URL', 'http://13.51.201.77:5000')
         cls.test_results = []
         cls.screenshots_dir = "screenshots"
         
         logger.info(f"Base URL: {cls.base_url}")
+        logger.info(f"Testing against EC2 instance: {cls.base_url}")
         
         # Create screenshots directory
         if not os.path.exists(cls.screenshots_dir):
@@ -68,9 +69,10 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             if response.status_code != 200:
                 logger.error(f"Health check failed with status code: {response.status_code}")
                 raise Exception(f"Web application health check failed: {response.status_code}")
-            logger.info("✓ Web application connectivity successful")
+            logger.info("✓ Successfully connected to TechFlow application on EC2")
         except Exception as e:
             logger.error(f"Failed to connect to web application: {e}")
+            logger.error("Please ensure the Flask application is running on EC2")
             log_error(f"Failed to connect to web application: {e}")
             raise
         

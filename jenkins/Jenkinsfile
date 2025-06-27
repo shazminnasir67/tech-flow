@@ -2,9 +2,18 @@ pipeline {
     agent any
     
     environment {
-        // Application Configuration
-        WEB_APP_URL = 'http://localhost:5000'
-        BASE_URL = 'http://localhost:5000'
+        // Application Configuration - EC2 Public IP
+        WEB_APP_URL = 'http://13.                        # Start web application in background with proper binding
+                        sh '''
+                            . ${WORKSPACE}/venv/bin/activate
+                            echo "Starting Flask application on 0.0.0.0:5000..."
+                            export FLASK_HOST=0.0.0.0
+                            export FLASK_PORT=5000
+                            python3 app.py > ../logs/web-app.log 2>&1 &
+                            echo $! > ../web-app.pid
+                            echo "Flask app started with PID: $(cat ../web-app.pid)"
+                        '''7:5000'
+        BASE_URL = 'http://13.51.201.77:5000'
         
         // Test Configuration
         TEST_DIR = 'selenium-tests'
@@ -137,10 +146,12 @@ pipeline {
                             fi
                         '''
                         
-                        // Start web application in background with better logging
+                        // Start web application in background with proper binding
                         sh '''
                             . ${WORKSPACE}/venv/bin/activate
-                            echo "Starting Flask application..."
+                            echo "Starting Flask application on 0.0.0.0:5000..."
+                            export FLASK_HOST=0.0.0.0
+                            export FLASK_PORT=5000
                             python3 app.py > ../logs/web-app.log 2>&1 &
                             echo $! > ../web-app.pid
                             echo "Flask app started with PID: $(cat ../web-app.pid)"
@@ -148,12 +159,12 @@ pipeline {
                         
                         // Wait for application to start with retries
                         sh '''
-                            echo "Waiting for Flask application to start..."
+                            echo "Waiting for Flask application to start on EC2..."
                             for i in {1..30}; do
                                 echo "Attempt $i: Checking if Flask app is running..."
-                                if curl -f http://localhost:5000/api/health > /dev/null 2>&1; then
-                                    echo "Flask application is running successfully!"
-                                    curl http://localhost:5000/api/health
+                                if curl -f http://13.51.201.77:5000/api/health > /dev/null 2>&1; then
+                                    echo "Flask application is running successfully on EC2!"
+                                    curl http://13.51.201.77:5000/api/health
                                     break
                                 fi
                                 if [ $i -eq 30 ]; then
@@ -251,46 +262,27 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    echo "Cleaning up test environment..."
+                    echo "Cleaning up test environment (keeping web app running)..."
                     
-                    // Stop web application with better logging
-                    sh '''
-                        echo "Stopping Flask web application..."
-                        if [ -f web-app.pid ]; then
-                            PID=$(cat web-app.pid)
-                            echo "Killing Flask app process $PID"
-                            kill $PID 2>/dev/null || true
-                            sleep 2
-                            if ps -p $PID > /dev/null 2>&1; then
-                                echo "Force killing Flask app process $PID"
-                                kill -9 $PID 2>/dev/null || true
-                            fi
-                            rm web-app.pid
-                            echo "Flask app stopped"
-                        else
-                            echo "No PID file found for Flask app"
-                        fi
-                        
-                        # Also check for any remaining Python processes running app.py
-                        echo "Checking for any remaining Flask processes..."
-                        pkill -f "python3 app.py" 2>/dev/null || true
-                    '''
+                    // Keep web application running for production access
+                    echo "Web application will remain running at http://13.51.201.77:5000"
+                    echo "You can access the app for manual testing and demonstration"
                     
-                    // Clean up Docker containers
+                    // Clean up Docker containers only
                     sh '''
                         echo "Cleaning up Docker containers..."
                         docker stop ${DOCKER_CONTAINER} 2>/dev/null || true
                         docker rm ${DOCKER_CONTAINER} 2>/dev/null || true
                     '''
                     
-                    // Clean up temporary files
+                    // Clean up temporary files only
                     sh '''
                         echo "Cleaning up temporary files..."
                         rm -rf selenium-tests/test-venv 2>/dev/null || true
                         rm -rf web-app/venv 2>/dev/null || true
                     '''
                     
-                    echo "Cleanup completed"
+                    echo "Cleanup completed - Web app still running on EC2"
                 }
             }
         }
@@ -299,28 +291,20 @@ pipeline {
     post {
         always {
             script {
-                // Always stop Flask app if it's running
-                sh '''
-                    echo "Post-build cleanup: Stopping Flask app..."
-                    if [ -f web-app.pid ]; then
-                        PID=$(cat web-app.pid)
-                        echo "Killing Flask app process $PID"
-                        kill $PID 2>/dev/null || true
-                        rm web-app.pid
-                    fi
-                    pkill -f "python3 app.py" 2>/dev/null || true
-                '''
+                // Keep Flask app running for production access
+                echo "Post-build: Keeping Flask app running on EC2..."
+                echo "Application accessible at: http://13.51.201.77:5000"
                 
-                // Always archive artifacts
+                // Only archive artifacts
                 archiveArtifacts(
                     artifacts: "${SCREENSHOTS_DIR}/**/*, ${REPORTS_DIR}/**/*, logs/**/*",
                     allowEmptyArchive: true
                 )
                 
                 // Record build information
-                currentBuild.description = "DevOps Assignment 3 - Build ${BUILD_NUMBER}"
+                currentBuild.description = "DevOps Assignment 3 - Build ${BUILD_NUMBER} - App Running on EC2"
                 
-                echo "Pipeline execution completed"
+                echo "Pipeline execution completed - Web app remains accessible"
             }
         }
         
@@ -330,17 +314,20 @@ pipeline {
                 
                 // Send success notification from Shazmin to Malik Qasim
                 emailext(
-                    subject: "${EMAIL_SUBJECT} - SUCCESS",
+                    subject: "${EMAIL_SUBJECT} - SUCCESS - Live on EC2",
                     body: """
-                    <h2>DevOps Assignment 3 - Test Suite PASSED</h2>
+                    <h2>DevOps Assignment 3 - Test Suite PASSED ✅</h2>
                     <p><strong>From:</strong> Shazmin Nasir (${EMAIL_SENDER})</p>
                     <p><strong>To:</strong> Malik Qasim (${EMAIL_RECIPIENTS})</p>
                     <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                     <p><strong>Build URL:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
                     <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
                     <p><strong>Test Results:</strong> All tests passed successfully</p>
+                    <p><strong>🌐 Live Application:</strong> <a href="http://13.51.201.77:5000">http://13.51.201.77:5000</a></p>
+                    <p><strong>API Health:</strong> <a href="http://13.51.201.77:5000/api/health">http://13.51.201.77:5000/api/health</a></p>
                     <p><strong>Screenshots:</strong> Available in build artifacts</p>
                     <p><strong>Reports:</strong> Available in build artifacts</p>
+                    <p><em>Note: Application is running live on EC2 and accessible for testing!</em></p>
                     """,
                     to: "${EMAIL_RECIPIENTS}",
                     from: "${EMAIL_SENDER}",
