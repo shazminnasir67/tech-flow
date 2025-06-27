@@ -30,31 +30,15 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('test_execution.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger(__name__)
 
-# Add file handler for detailed test results
-test_results_logger = logging.getLogger('test_results')
-test_results_logger.setLevel(logging.INFO)
-fh = logging.FileHandler('test_results_detailed.log')
-fh.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-test_results_logger.addHandler(fh)
-
-# Add file handler for error-only logging
-error_logger = logging.getLogger('error_logger')
-error_logger.setLevel(logging.ERROR)
-error_fh = logging.FileHandler('detailed_errors.log')
-error_fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-error_logger.addHandler(error_fh)
-
-# Also log errors to the main logger
+# Simple function to log errors
 def log_error(message):
-    """Log error to both main logger and error logger."""
+    """Log error to console."""
     logger.error(message)
-    error_logger.error(message)
 
 class DevOpsAssignmentTestSuite(unittest.TestCase):
     """Main test suite for DevOps Assignment 3 web application."""
@@ -63,45 +47,34 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
     def setUpClass(cls):
         """Set up test environment once for all tests."""
         logger.info("Setting up test environment...")
-        test_results_logger.info("=" * 80)
-        test_results_logger.info("TEST ENVIRONMENT SETUP")
-        test_results_logger.info("=" * 80)
         
         # Test configuration
         cls.base_url = "http://localhost:5000"
         cls.test_results = []
         cls.screenshots_dir = "screenshots"
         
-        test_results_logger.info(f"Base URL: {cls.base_url}")
-        test_results_logger.info(f"Screenshots directory: {cls.screenshots_dir}")
+        logger.info(f"Base URL: {cls.base_url}")
         
         # Create screenshots directory
         if not os.path.exists(cls.screenshots_dir):
             os.makedirs(cls.screenshots_dir)
-            test_results_logger.info("Created screenshots directory")
+            logger.info("Created screenshots directory")
         
         # Test connection to web application
         logger.info(f"Testing connection to web application at {cls.base_url}")
-        test_results_logger.info("Testing web application connectivity...")
         try:
             response = requests.get(f"{cls.base_url}/api/health", timeout=10)
-            logger.info(f"Health check response: {response.status_code} - {response.text}")
-            test_results_logger.info(f"Health check response: {response.status_code} - {response.text}")
+            logger.info(f"Health check response: {response.status_code}")
             if response.status_code != 200:
                 logger.error(f"Health check failed with status code: {response.status_code}")
-                test_results_logger.error(f"Health check failed with status code: {response.status_code}")
                 raise Exception(f"Web application health check failed: {response.status_code}")
-            test_results_logger.info("✓ Web application connectivity successful")
+            logger.info("✓ Web application connectivity successful")
         except Exception as e:
             logger.error(f"Failed to connect to web application: {e}")
-            test_results_logger.error(f"Failed to connect to web application: {e}")
             log_error(f"Failed to connect to web application: {e}")
-            logger.error("Please ensure the Flask application is running on the EC2 instance")
-            test_results_logger.error("Please ensure the Flask application is running on the EC2 instance")
             raise
         
         # Chrome options for headless testing
-        test_results_logger.info("Setting up Chrome WebDriver...")
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
@@ -110,19 +83,17 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         
-        test_results_logger.info("Chrome options configured")
+        logger.info("Chrome options configured")
         
         # Use webdriver-manager to handle ChromeDriver
         try:
-            test_results_logger.info("Installing ChromeDriver...")
+            logger.info("Installing ChromeDriver...")
             driver_path = ChromeDriverManager().install()
             logger.info(f"ChromeDriver path: {driver_path}")
-            test_results_logger.info(f"ChromeDriver path: {driver_path}")
             
             # Find the real chromedriver executable
             base_dir = os.path.dirname(driver_path)
             logger.info(f"Base directory: {base_dir}")
-            test_results_logger.info(f"Base directory: {base_dir}")
             
             # The actual chromedriver is usually in a subdirectory
             # Look for directories that might contain the executable
@@ -132,18 +103,15 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             if os.path.basename(driver_path) == 'chromedriver' and os.access(driver_path, os.X_OK):
                 actual_driver_path = driver_path
                 logger.info(f"Found chromedriver executable: {actual_driver_path}")
-                test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
             else:
                 # Check the current directory first for chromedriver executable
                 logger.info(f"Checking current directory: {base_dir}")
-                test_results_logger.info(f"Checking current directory: {base_dir}")
                 for file in os.listdir(base_dir):
                     if file == 'chromedriver':
                         candidate = os.path.join(base_dir, file)
                         if os.access(candidate, os.X_OK):
                             actual_driver_path = candidate
                             logger.info(f"Found chromedriver executable: {actual_driver_path}")
-                            test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
                             break
                 
                 # If not found in current directory, look for subdirectories
@@ -152,7 +120,6 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
                         item_path = os.path.join(base_dir, item)
                         if os.path.isdir(item_path):
                             logger.info(f"Checking subdirectory: {item_path}")
-                            test_results_logger.info(f"Checking subdirectory: {item_path}")
                             # Look for chromedriver executable in this subdirectory
                             for file in os.listdir(item_path):
                                 if file == 'chromedriver':
@@ -160,55 +127,35 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
                                     if os.access(candidate, os.X_OK):
                                         actual_driver_path = candidate
                                         logger.info(f"Found chromedriver executable: {actual_driver_path}")
-                                        test_results_logger.info(f"Found chromedriver executable: {actual_driver_path}")
                                         break
                             if actual_driver_path:
                                 break
             
             if not actual_driver_path:
                 logger.error("Could not find a valid chromedriver executable!")
-                test_results_logger.error("Could not find a valid chromedriver executable!")
                 log_error("Could not find a valid chromedriver executable!")
-                logger.error(f"Available files in {base_dir}:")
-                for item in os.listdir(base_dir):
-                    item_path = os.path.join(base_dir, item)
-                    if os.path.isdir(item_path):
-                        logger.error(f"  Directory: {item}")
-                        try:
-                            for subitem in os.listdir(item_path):
-                                logger.error(f"    - {subitem}")
-                        except:
-                            logger.error(f"    - (cannot list contents)")
-                    else:
-                        logger.error(f"  File: {item}")
                 raise Exception("No valid chromedriver executable found")
             
             service = Service(actual_driver_path)
             logger.info("ChromeDriver installed successfully")
-            test_results_logger.info("✓ ChromeDriver installed successfully")
         except Exception as e:
             logger.error(f"Failed to install ChromeDriver: {e}")
-            test_results_logger.error(f"Failed to install ChromeDriver: {e}")
             log_error(f"Failed to install ChromeDriver: {e}")
             raise
         
         # Initialize WebDriver
         try:
-            test_results_logger.info("Initializing WebDriver...")
+            logger.info("Initializing WebDriver...")
             cls.driver = webdriver.Chrome(service=service, options=chrome_options)
             cls.driver.implicitly_wait(10)
             cls.wait = WebDriverWait(cls.driver, 10)
             logger.info("WebDriver initialized successfully")
-            test_results_logger.info("✓ WebDriver initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize WebDriver: {e}")
-            test_results_logger.error(f"Failed to initialize WebDriver: {e}")
             log_error(f"Failed to initialize WebDriver: {e}")
             raise
         
         logger.info("Test environment setup completed")
-        test_results_logger.info("✓ Test environment setup completed")
-        test_results_logger.info("=" * 80)
     
     @classmethod
     def tearDownClass(cls):
@@ -238,17 +185,15 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             screenshot_path = os.path.join(self.screenshots_dir, screenshot_name)
             self.driver.save_screenshot(screenshot_path)
             logger.error(f"Test failed. Screenshot saved: {screenshot_path}")
-            test_results_logger.error(f"TEST FAILED: {self._testMethodName}")
-            test_results_logger.error(f"Screenshot saved: {screenshot_path}")
             
             # Log the actual error details
             if hasattr(self, '_outcome'):
                 for test, traceback in self._outcome.errors:
-                    test_results_logger.error(f"Error in {test}: {traceback}")
+                    logger.error(f"Error in {test}: {traceback}")
                 for test, traceback in self._outcome.failures:
-                    test_results_logger.error(f"Failure in {test}: {traceback}")
+                    logger.error(f"Failure in {test}: {traceback}")
         else:
-            test_results_logger.info(f"TEST PASSED: {self._testMethodName}")
+            logger.info(f"TEST PASSED: {self._testMethodName}")
         
         # Record test result
         test_result = {
@@ -261,7 +206,6 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         self.test_results.append(test_result)
         
         logger.info(f"Completed test: {self._testMethodName} ({test_duration:.2f}s)")
-        test_results_logger.info(f"Test duration: {test_duration:.2f}s")
     
     def take_screenshot(self, name):
         """Take a screenshot with timestamp."""
@@ -858,15 +802,12 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
 def run_test_suite():
     """Run the complete test suite and generate report."""
     logger.info("Starting DevOps Assignment 3 Test Suite...")
-    test_results_logger.info("=" * 80)
-    test_results_logger.info("STARTING TEST SUITE EXECUTION")
-    test_results_logger.info("=" * 80)
     
     # Create test suite
     suite = unittest.TestLoader().loadTestsFromTestCase(DevOpsAssignmentTestSuite)
     
     # Run tests with detailed output
-    runner = unittest.TextTestRunner(verbosity=3, stream=sys.stdout)
+    runner = unittest.TextTestRunner(verbosity=2, stream=sys.stdout)
     result = runner.run(suite)
     
     # Generate summary
@@ -875,16 +816,7 @@ def run_test_suite():
     error_tests = len(result.errors)
     passed_tests = total_tests - failed_tests - error_tests
     
-    # Log summary to file
-    test_results_logger.info("=" * 80)
-    test_results_logger.info("TEST SUITE SUMMARY")
-    test_results_logger.info("=" * 80)
-    test_results_logger.info(f"Total Tests: {total_tests}")
-    test_results_logger.info(f"Passed: {passed_tests}")
-    test_results_logger.info(f"Failed: {failed_tests}")
-    test_results_logger.info(f"Errors: {error_tests}")
-    test_results_logger.info(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
-    
+    # Log summary
     logger.info("=" * 60)
     logger.info("TEST SUITE SUMMARY")
     logger.info("=" * 60)
@@ -895,30 +827,7 @@ def run_test_suite():
     logger.info(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
     logger.info("=" * 60)
     
-    # Print detailed failure information
-    if result.failures:
-        logger.error("FAILURES:")
-        test_results_logger.error("FAILURES:")
-        for test, traceback in result.failures:
-            logger.error(f"Test: {test}")
-            logger.error(f"Traceback: {traceback}")
-            logger.error("-" * 40)
-            test_results_logger.error(f"Test: {test}")
-            test_results_logger.error(f"Traceback: {traceback}")
-            test_results_logger.error("-" * 40)
-    
-    if result.errors:
-        logger.error("ERRORS:")
-        test_results_logger.error("ERRORS:")
-        for test, traceback in result.errors:
-            logger.error(f"Test: {test}")
-            logger.error(f"Traceback: {traceback}")
-            logger.error("-" * 40)
-            test_results_logger.error(f"Test: {test}")
-            test_results_logger.error(f"Traceback: {traceback}")
-            test_results_logger.error("-" * 40)
-    
-    # Save detailed results to JSON file
+    # Save results to JSON file
     detailed_results = {
         'summary': {
             'total_tests': total_tests,
@@ -932,19 +841,15 @@ def run_test_suite():
         'timestamp': datetime.now().isoformat()
     }
     
-    with open('test_results_detailed.json', 'w') as f:
+    with open('test_results.json', 'w') as f:
         json.dump(detailed_results, f, indent=2, default=str)
-    
-    test_results_logger.info("Detailed results saved to test_results_detailed.json")
     
     # Exit with appropriate code
     if failed_tests > 0 or error_tests > 0:
         logger.error("Test suite failed!")
-        test_results_logger.error("TEST SUITE FAILED!")
         sys.exit(1)
     else:
         logger.info("Test suite passed!")
-        test_results_logger.info("TEST SUITE PASSED!")
         sys.exit(0)
 
 

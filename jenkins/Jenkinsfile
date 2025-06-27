@@ -55,7 +55,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    echo "Starting DevOps Assignment 3 CI/CD Pipeline"
+                    echo "Starting DevOps Assignment 3 CI/CD Pipeline - Updated for ChromeDriver fix"
                     echo "Build Number: ${BUILD_NUMBER}"
                     echo "Build URL: ${BUILD_URL}"
                 }
@@ -211,54 +211,6 @@ pipeline {
             }
         }
         
-        stage('Connection Test') {
-            steps {
-                script {
-                    echo "Testing connection to web application..."
-                    
-                    dir('selenium-tests') {
-                        // Test connection to web application
-                        sh '''
-                            . ${WORKSPACE}/venv/bin/activate
-                            python3 test_connection.py
-                        '''
-                    }
-                }
-            }
-        }
-        
-        stage('Debug Test') {
-            steps {
-                script {
-                    echo "Running debug test to identify issues..."
-                    
-                    dir('selenium-tests') {
-                        // Run debug test with detailed output
-                        sh '''
-                            . ${WORKSPACE}/venv/bin/activate
-                            python3 debug_test.py
-                        '''
-                    }
-                }
-            }
-        }
-        
-        stage('Simple Test') {
-            steps {
-                script {
-                    echo "Running simple test to verify basic functionality..."
-                    
-                    dir('selenium-tests') {
-                        // Run simple test without complex logging
-                        sh '''
-                            . ${WORKSPACE}/venv/bin/activate
-                            python3 simple_test.py
-                        '''
-                    }
-                }
-            }
-        }
-        
         stage('Run Selenium Tests') {
             steps {
                 script {
@@ -275,42 +227,9 @@ pipeline {
                             // Run test suite
                             sh '''
                                 . ${WORKSPACE}/venv/bin/activate
-                                python3 test_suite.py 2>&1 | tee ../logs/test-execution.log
+                                python3 test_suite.py
                             '''
                         }
-                        
-                        // Check test results
-                        sh '''
-                            if [ -f test_results.json ]; then
-                                echo "Test results file found"
-                                cat test_results.json
-                            else
-                                echo "No test results file found"
-                                exit 1
-                            fi
-                            
-                            # Display detailed logs
-                            echo "=== DETAILED ERROR LOG ==="
-                            if [ -f detailed_errors.log ]; then
-                                cat detailed_errors.log
-                            else
-                                echo "No detailed errors log found"
-                            fi
-                            
-                            echo "=== TEST RESULTS DETAILED LOG ==="
-                            if [ -f test_results_detailed.log ]; then
-                                cat test_results_detailed.log
-                            else
-                                echo "No detailed test results log found"
-                            fi
-                            
-                            echo "=== TEST EXECUTION LOG ==="
-                            if [ -f test_execution.log ]; then
-                                cat test_execution.log
-                            else
-                                echo "No test execution log found"
-                            fi
-                        '''
                     }
                 }
             }
