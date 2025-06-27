@@ -111,6 +111,17 @@ pipeline {
                         python3 -m pip install --upgrade pip
                         python3 -m pip install selenium webdriver-manager pytest
                     '''
+                    
+                    // Install Google Chrome
+                    sh '''
+                        sudo apt-get update
+                        sudo apt-get install -y wget gnupg unzip curl xvfb
+                        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+                        echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+                        sudo apt-get update
+                        sudo apt-get install -y google-chrome-stable
+                        google-chrome --version
+                    '''
                 }
             }
         }
