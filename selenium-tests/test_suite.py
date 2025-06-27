@@ -105,7 +105,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             'test_name': self._testMethodName,
             'status': 'PASS' if self._outcome.success else 'FAIL',
             'duration': test_duration,
-            'timestamp': test_start_time.isoformat(),
+            'timestamp': self.test_start_time.isoformat(),
             'screenshot': screenshot_name if hasattr(self, '_outcome') and not self._outcome.success else None
         }
         self.test_results.append(test_result)
