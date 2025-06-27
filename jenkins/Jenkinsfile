@@ -353,49 +353,10 @@ pipeline {
             script {
                 echo "Pipeline failed!"
                 
-                // Send failure notification from Shazmin to Malik Qasim
-                emailext(
-                    subject: "${EMAIL_SUBJECT} - FAILED",
-                    body: """
-                    <h2>DevOps Assignment 3 - Test Suite FAILED</h2>
-                    <p><strong>From:</strong> Shazmin Nasir (${EMAIL_SENDER})</p>
-                    <p><strong>To:</strong> Malik Qasim (${EMAIL_RECIPIENTS})</p>
-                    <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
-                    <p><strong>Build URL:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
-                    <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
-                    <p><strong>Failure Stage:</strong> ${currentBuild.description}</p>
-                    <p><strong>Console Output:</strong> <a href="${BUILD_URL}console">View Console</a></p>
-                    <p><strong>Test Results:</strong> Check build artifacts for details</p>
-                    """,
-                    to: "${EMAIL_RECIPIENTS}",
-                    from: "${EMAIL_SENDER}",
-                    mimeType: 'text/html'
-                )
+                
             }
         }
         
-        unstable {
-            script {
-                echo "Pipeline is unstable!"
-                
-                // Send unstable notification from Shazmin to Malik Qasim
-                emailext(
-                    subject: "${EMAIL_SUBJECT} - UNSTABLE",
-                    body: """
-                    <h2>DevOps Assignment 3 - Test Suite UNSTABLE</h2>
-                    <p><strong>From:</strong> Shazmin Nasir (${EMAIL_SENDER})</p>
-                    <p><strong>To:</strong> Malik Qasim (${EMAIL_RECIPIENTS})</p>
-                    <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
-                    <p><strong>Build URL:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
-                    <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
-                    <p><strong>Status:</strong> Some tests failed or were unstable</p>
-                    <p><strong>Test Results:</strong> Check build artifacts for details</p>
-                    """,
-                    to: "${EMAIL_RECIPIENTS}",
-                    from: "${EMAIL_SENDER}",
-                    mimeType: 'text/html'
-                )
-            }
-        }
+        
     }
 } 

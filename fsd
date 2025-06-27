@@ -1,0 +1,231 @@
+[33mcommit 8541f3a77f1057a92cf6c695a0794de2d424ba8b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 23:26:15 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 0195cf89769f610cb1fdece6d1c65cfc60f74f2b[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 23:04:24 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit c6f505515183aa1e4d6ff0c99aa621245aed0265[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 22:52:21 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit ef340ebb8339ef8a066f1f680608cb58b7a076b6[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 22:42:55 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit c6e4996a39b0bd87e94100609869caac662b983a[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 22:27:52 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 34ef6d1a4bef24e6254bded80cac166221b69ebb[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 21:42:58 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 89dcd8785a465c9a96c817af30c2e4ff6f8360f0[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 21:32:39 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 00d37bca2c85d855031613c3c7a553a8ed9c31f6[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 19:43:23 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit f1ece8452e744408016b70f7dcf2bed346e680d1[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 19:33:14 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 2a590ba33e9bf1042e9de357078b4d7021e6b093[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 19:21:58 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 07de87a91a3a93958086fbc4eb86d22da6464ab6[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 18:29:41 2025 +0500
+
+    Fix test expectations to match actual Flask app messages - registration success message
+
+[33mcommit 390bf96b80481dc9b5adba64e89768113a8a3ed6[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 18:11:43 2025 +0500
+
+    Remove all extra stages: Docker Testing, Performance Testing, Generate Reports - keep only essential pipeline
+
+[33mcommit c35e7d037f7f1f32c1a6e2a4884e133e26618273[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 18:09:28 2025 +0500
+
+    Remove test_connection.py file - no longer needed after removing connection test stage
+
+[33mcommit dd5e26978b891731c187c4c169904c5ac2e28d81[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 18:07:26 2025 +0500
+
+    Simplify pipeline: remove debug stages and excessive logging, keep only essential test execution
+
+[33mcommit b36360b90f60f4aa74cd8f5d05f0ab136359bfbd[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:55:26 2025 +0500
+
+    Fix ChromeDriver detection to check current directory first for executable
+
+[33mcommit b702c1c8deba2a377a87c8c45fe38afda5313845[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:52:21 2025 +0500
+
+    Improve ChromeDriver path detection with better directory traversal and debugging
+
+[33mcommit 4e1de6fe6e50d7e4af11d85742af2697c02a261b[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:49:54 2025 +0500
+
+    Fix ChromeDriver path logic to find actual executable, not THIRD_PARTY_NOTICES file
+
+[33mcommit 54ccedb4ef6751fdf0b4d2bdac704fa34b5d1b3f[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:43:43 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 2cd628dd245c6a5910db576c70baa7eeec8bce40[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:42:26 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit b9161714909784f267dd05f73f3b881dcadeac16[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:40:47 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 3753f90212e8fff660b18a72938c1f7c888ddf96[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:31:54 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 09e3dee5e2e1ec3e32aee975001c960c10e02a0c[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:29:06 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 60b95f8247d85a9eb00ff9d91dbc65ea2da94016[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:21:37 2025 +0500
+
+    Fix logging configuration error and add simple test stage
+
+[33mcommit 48845a6f9a67b072af3213bc6a7085961194c9a7[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:08:24 2025 +0500
+
+    Add comprehensive file-based logging for detailed error tracking
+
+[33mcommit 73d7b27e16c794b0acca15252f224fb61707aa66[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:04:01 2025 +0500
+
+    Add enhanced debugging and error logging to test suite
+
+[33mcommit 0c7f15d13282cc31a845167b33e59386503dc05c[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 17:00:09 2025 +0500
+
+    Fix test suite to match actual TechFlow application - Update page titles to match TechFlow branding - Fix navigation link text (Sign up/Sign in) - Update password validation to expect 8 characters - Fix API endpoint test to use correct /api/stats endpoint - Update UI element presence checks
+
+[33mcommit d06f65aa8e12f484a08bee13ae0976ac4ede6a34[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 16:55:17 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 3a191d82ab3eb94ffd6628ba1425ceccb8a16911[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 16:34:07 2025 +0500
+
+    Update pipeline to use EC2 IP address and enhance error handling - Replace localhost:5000 with 13.51.201.77:5000 throughout pipeline - Add enhanced error handling and logging to test suite - Create connection test script for troubleshooting - Add connection test stage to Jenkins pipeline - Improve WebDriver initialization with better error messages
+
+[33mcommit 3097cdef2869261057994e773ded0ed912ba35c8[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 15:44:58 2025 +0500
+
+    Save local changes before pull
+
+[33mcommit 740e869392364b5b36ce3205cc94141d6b65c9e9[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 03:14:08 2025 +0500
+
+    Fix ChromeDriver issue: use webdriver-manager instead of deprecated URLs
+
+[33mcommit 455a4865de7bcea0e4f5e497276777f0291a5c66[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 03:10:29 2025 +0500
+
+    Fix ChromeDriver installation in Dockerfile
+
+[33mcommit 5665123cc85edae176bd67d22d1ba6a4cc570059[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 03:09:56 2025 +0500
+
+    Fix ChromeDriver installation in Dockerfile using webdriver-manager
+
+[33mcommit 20626f0ae591e611f3a2ae35fd2d3caac6f05073[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 02:54:23 2025 +0500
+
+    Remove publishJSON step to fix Jenkins compatibility
+
+[33mcommit 1554e04dfa6245f8f1270f30d14124781924abeb[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 02:43:18 2025 +0500
+
+    Fix shell compatibility: use . instead of source
+
+[33mcommit 25f625b651dd9443fb98cb1bb12bc2db77753d85[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 02:40:20 2025 +0500
+
+    Fix virtual environment setup for Ubuntu 22.04+
+
+[33mcommit 7945ab6b6b16416a733a2a5fcc1fab173863a1f9[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 02:34:55 2025 +0500
+
+    Fix Jenkins pipeline: remove sudo commands and simplify setup
+
+[33mcommit ac065f8cb3a2f3d4ca2e3b0533a3e8405e018968[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 02:26:19 2025 +0500
+
+    Clean up project files
+
+[33mcommit f574c0fc68ceab00eb13677d8b30ae2deea539da[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:   Fri Jun 27 01:12:18 2025 +0500
+
+    Update email configuration with correct recipient emails
+
+[33mcommit 454f9a216bf6268c44f27df2ef293c8ed3783051[m
+Author: Shazmin Nasir <alviawan97@gmail.com>
+Date:
