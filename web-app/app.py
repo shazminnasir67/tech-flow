@@ -4,7 +4,7 @@ TechFlow - Professional Developer Collaboration Platform
 A modern web application for team collaboration, project management, and code sharing.
 """
 
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, get_flashed_messages, get_flashed_messages
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -112,7 +112,7 @@ class UserActivity(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
-        return f'<UserActivity {self.activity_type}>'
+        return f'<UserActivity {self.activity_type}'
 
 # Routes
 @app.route('/')
@@ -529,6 +529,23 @@ def init_db():
         else:
             logger.info("Database already initialized")
 
+@app.route('/test-flash')
+def test_flash():
+    """Test endpoint to verify flash messages are working."""
+    flash('This is a test success message!', 'success')
+    flash('This is a test error message!', 'error')
+    flash('This is a test info message!', 'info')
+    return redirect(url_for('login'))
+
+@app.route('/flash-debug')
+def flash_debug():
+    """Debug endpoint to show current flash messages."""
+    messages = get_flashed_messages(with_categories=True)
+    return jsonify({
+        'flash_messages': [{'category': cat, 'message': msg} for cat, msg in messages],
+        'total_messages': len(messages)
+    })
+
 if __name__ == '__main__':
     # Initialize database
     init_db()
@@ -538,4 +555,4 @@ if __name__ == '__main__':
         host='0.0.0.0',
         port=5000,
         debug=True
-    ) 
+    )

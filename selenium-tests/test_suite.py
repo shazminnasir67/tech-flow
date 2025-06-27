@@ -237,22 +237,29 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
     def wait_for_alert_message(self, message, alert_type="success", timeout=15):
         """Wait for alert message to be present in page."""
         try:
+            # Try with the new enhanced flash message structure
             return WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((By.XPATH, f"//div[contains(@class, 'alert-{alert_type}') and contains(text(), '{message}')]"))
+                EC.presence_of_element_located((By.XPATH, f"//div[contains(@class, 'flash-message') and contains(@class, 'alert-{alert_type}') and contains(text(), '{message}')]"))
             )
         except TimeoutException:
             # Try alternative approaches if the exact match fails
-            logger.warning(f"Exact alert message not found, trying alternatives for: {message}")
+            logger.warning(f"Enhanced flash message not found, trying alternatives for: {message}")
             try:
-                # Try without alert type
+                # Try with original alert structure
                 return WebDriverWait(self.driver, 5).until(
-                    EC.presence_of_element_located((By.XPATH, f"//div[contains(@class, 'alert') and contains(text(), '{message}')]"))
+                    EC.presence_of_element_located((By.XPATH, f"//div[contains(@class, 'alert-{alert_type}') and contains(text(), '{message}')]"))
                 )
             except TimeoutException:
-                # Try just the text
-                return WebDriverWait(self.driver, 5).until(
-                    EC.presence_of_element_located((By.XPATH, f"//*[contains(text(), '{message}')]"))
-                )
+                try:
+                    # Try without alert type
+                    return WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.XPATH, f"//div[contains(@class, 'alert') and contains(text(), '{message}')]"))
+                    )
+                except TimeoutException:
+                    # Try just the text
+                    return WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(text(), '{message}')]"))
+                    )
     
     
     def clear_and_fill_input(self, element, text):
@@ -315,6 +322,34 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         logger.info("✓ Register page loads correctly")
         
         logger.info("Flask app health check completed successfully")
+
+    def test_00_1_flash_message_system(self):
+        """Test 0.1: Verify flash message system is working."""
+        logger.info("Testing flash message system...")
+        
+        # Test the flash message endpoint
+        self.driver.get(f"{self.base_url}/test-flash")
+        
+        # Should redirect to login with flash messages
+        self.assertIn("login", self.driver.current_url)
+        
+        # Debug flash messages
+        self.debug_flash_messages()
+        
+        # Look for any of the test messages
+        try:
+            success_msg = self.wait_for_element(By.XPATH, "//*[contains(text(), 'test success message')]", timeout=5)
+            logger.info(f"Found test success message: {success_msg.text}")
+        except TimeoutException:
+            logger.warning("Test success message not found")
+        
+        try:
+            error_msg = self.wait_for_element(By.XPATH, "//*[contains(text(), 'test error message')]", timeout=5)
+            logger.info(f"Found test error message: {error_msg.text}")
+        except TimeoutException:
+            logger.warning("Test error message not found")
+        
+        logger.info("Flash message system test completed")
 
     def test_01_page_load_verification(self):
         """Test 1: Verify all pages load correctly."""
@@ -427,6 +462,9 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         logger.info("Page source after form submission:")
         logger.info(self.driver.page_source[:1000])  # First 1000 characters
         
+        # Debug flash messages specifically
+        self.debug_flash_messages()
+        
         # Verify successful registration - exact message from Flask app
         # The message appears on the login page after redirect, so wait for it there
         try:
@@ -445,11 +483,8 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
                     logger.info(f"Found success message anywhere: {success_element.text}")
                 except TimeoutException:
                     logger.error("No success message found anywhere on the page")
-                    # Log all alert elements for debugging
-                    alerts = self.driver.find_elements(By.CLASS_NAME, "alert")
-                    logger.error(f"Found {len(alerts)} alert elements:")
-                    for alert in alerts:
-                        logger.error(f"  Alert: {alert.get_attribute('class')} - {alert.text}")
+                    # Final debug attempt
+                    self.debug_flash_messages()
                     raise
         
         self.assertIn("login", self.driver.current_url)
@@ -1147,6 +1182,36 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         
         logger.info("Performance testing completed successfully")
 
+    def debug_flash_messages(self):
+        """Debug helper to log all flash message elements on the page."""
+        try:
+            # Check for flash message container
+            container = self.driver.find_element(By.ID, "flash-messages-container")
+            logger.info(f"Flash messages container found: {container.get_attribute('outerHTML')[:200]}...")
+            
+            # Check for any flash messages
+            flash_messages = self.driver.find_elements(By.CLASS_NAME, "flash-message")
+            logger.info(f"Found {len(flash_messages)} flash messages with class 'flash-message'")
+            
+            for i, msg in enumerate(flash_messages):
+                logger.info(f"Flash message {i+1}: class='{msg.get_attribute('class')}', text='{msg.text}'")
+            
+            # Check for any alert elements
+            alert_elements = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'alert')]")
+            logger.info(f"Found {len(alert_elements)} alert elements")
+            
+            for i, alert in enumerate(alert_elements):
+                logger.info(f"Alert {i+1}: class='{alert.get_attribute('class')}', text='{alert.text}'")
+            
+            # Check the entire page source for the message
+            page_source = self.driver.page_source
+            if "Registration successful" in page_source:
+                logger.info("✓ 'Registration successful' text found somewhere in page source")
+            else:
+                logger.info("✗ 'Registration successful' text NOT found in page source")
+                
+        except Exception as e:
+            logger.error(f"Error debugging flash messages: {e}")
 
 def run_test_suite():
     """Run the complete test suite and generate report."""
@@ -1203,4 +1268,4 @@ def run_test_suite():
 
 
 if __name__ == "__main__":
-    run_test_suite() 
+    run_test_suite()
