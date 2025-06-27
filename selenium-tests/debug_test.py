@@ -69,15 +69,17 @@ def test_selenium_basic():
         
         # Use webdriver-manager to handle ChromeDriver
         print("1. Installing ChromeDriver...")
-        driver_path = ChromeDriverManager().install()
-        print(f"   ChromeDriver path: {driver_path}")
+        initial_path = ChromeDriverManager().install()
+        print(f"   Initial ChromeDriver path: {initial_path}")
         
         # Find the real chromedriver executable
-        driver_dir = os.path.dirname(driver_path)
+        driver_dir = os.path.dirname(initial_path)
         print(f"   Looking in directory: {driver_dir}")
         
         # Check if we need to look in a subdirectory (like chromedriver-linux64)
         subdirs = [d for d in os.listdir(driver_dir) if os.path.isdir(os.path.join(driver_dir, d)) and 'chromedriver' in d.lower()]
+        driver_path = None
+        
         if subdirs:
             # Look in the subdirectory first
             subdir = os.path.join(driver_dir, subdirs[0])
@@ -91,19 +93,19 @@ def test_selenium_basic():
                         break
         
         # If not found in subdirectory, check the main directory
-        if not os.access(driver_path, os.X_OK):
-            found_driver = False
+        if not driver_path:
+            print(f"   Checking main directory: {driver_dir}")
             for file in os.listdir(driver_dir):
                 if file == 'chromedriver' or file == 'chromedriver.exe':
                     candidate = os.path.join(driver_dir, file)
                     if os.access(candidate, os.X_OK):
                         driver_path = candidate
-                        found_driver = True
                         print(f"   Found chromedriver executable: {driver_path}")
                         break
-            if not found_driver:
-                print("   ✗ Could not find a valid chromedriver executable!")
-                return False
+        
+        if not driver_path:
+            print("   ✗ Could not find a valid chromedriver executable!")
+            return False
         
         service = Service(driver_path)
         print("   ✓ ChromeDriver service created")
