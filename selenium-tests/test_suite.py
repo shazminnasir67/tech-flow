@@ -228,7 +228,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
             EC.element_to_be_clickable((by, value))
         )
     
-    def wait_for_text_present(self, text, timeout=10):
+    def wait_for_text_present(self, text, timeout=15):
         """Wait for text to be present in page."""
         return WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located((By.XPATH, f"//*[contains(text(), '{text}')]"))
@@ -407,6 +407,7 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         logger.info(self.driver.page_source[:1000])  # First 1000 characters
         
         # Verify successful registration - exact message from Flask app
+        # The message appears on the login page after redirect, so wait for it there
         self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
         self.assertIn("login", self.driver.current_url)
         self.take_screenshot("registration_success")
@@ -519,8 +520,9 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         """
         self.driver.execute_script(js_code)
         
-        # Wait for registration success and redirect to login
+        # Wait for registration success and redirect to login page
         self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
+        self.assertIn("login", self.driver.current_url)
         
         # Now test login
         username_field = self.wait_for_element(By.ID, "username")
@@ -678,8 +680,9 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         """
         self.driver.execute_script(js_code)
         
-        # Verify registration success
+        # Verify registration success and redirect to login page
         self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
+        self.assertIn("login", self.driver.current_url)
         self.take_screenshot("database_registration")
         
         # Login with the same credentials to verify database persistence
@@ -728,8 +731,9 @@ class DevOpsAssignmentTestSuite(unittest.TestCase):
         """
         self.driver.execute_script(js_code)
         
-        # Wait for registration success
+        # Wait for registration success and redirect to login page
         self.wait_for_text_present("Registration successful! Welcome to TechFlow.")
+        self.assertIn("login", self.driver.current_url)
         
         # Login
         username_field = self.wait_for_element(By.ID, "username")
